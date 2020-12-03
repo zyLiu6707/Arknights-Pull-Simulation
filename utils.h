@@ -31,4 +31,4 @@ auto get_random_seed() {
 // TODO: finish this!
 void process_command_line_input() {}
 
-#endif
+#endif  // UTILS_H

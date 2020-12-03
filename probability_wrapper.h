@@ -29,45 +29,34 @@ class ProbabilityWrapper {
         delta_base_star6_rate(_delta_base_star6_rate),
         banner_operator_num(_banner_operator_num){};
 
-  double get_base_star6_rate() { 
-    return base_star6_rate; 
-  }
+  // Getters
+  const double get_base_star6_rate();
 
-  double get_on_banner_star6_conditional_rate() {
-    return on_banner_star6_conditional_rate;
-  }
+  const double get_on_banner_star6_conditional_rate();
 
-  double get_delta_star6_base_rate(){
-    return delta_base_star6_rate;
-  }
+  const double get_delta_star6_base_rate();
 
-  unsigned int get_banner_operator_num() { 
-    return banner_operator_num;
-  }
+  const unsigned int get_banner_operator_num();
 
   // calculate the initial threshold of getting a any star 6 operator
   // based on the range of uniform int distribution
-  double calc_init_star6_threshold(const unsigned int dist_left_border, unsigned int dist_right_border) {
-    return (dist_right_border - dist_left_border + 1) * base_star6_rate;
-  }
+  double calc_init_star6_threshold(const unsigned int dist_left_border, 
+                                   const unsigned int dist_right_border);
 
   // calculate the initial threshold of getting a specific star 6 operator
   // based on the range of uniform int distribution
-  double calc_init_target_star6_threshold(const unsigned int dist_left_border, unsigned int dist_right_border) {
-    return (dist_right_border - dist_left_border + 1) * base_star6_rate * on_banner_star6_conditional_rate / banner_operator_num;
-  }
+  double calc_init_target_star6_threshold(const unsigned int dist_left_border,
+                                          const unsigned int dist_right_border);
 
   // calculate the change step of the threshold of getting a any star 6 operator
   // after the pity system comming into effect
-  unsigned int calc_star6_threshold_change_step(const unsigned int dist_left_border, unsigned int dist_right_border) {
-    return (dist_right_border - dist_left_border + 1) * delta_base_star6_rate;
-  }
+  unsigned int calc_star6_threshold_change_step(const unsigned int dist_left_border,
+                                                const unsigned int dist_right_border);
 
   // calculate the change step of the threshold of getting the target star 6 operator
   // after the pity system comming into effect
-  unsigned int calc_target_star6_threshold_change_step(const unsigned int dist_left_border, unsigned int dist_right_border) {
-    return calc_star6_threshold_change_step(dist_left_border, dist_right_border) * on_banner_star6_conditional_rate / banner_operator_num;
-  }
+  unsigned int calc_target_star6_threshold_change_step(const unsigned int dist_left_border,
+                                                       const unsigned int dist_right_border);
 };
 
-#endif
+#endif  // PROBABILITY_WRAPPER_H
