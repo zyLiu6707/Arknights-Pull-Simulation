@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
   unsigned int seed = get_random_seed();
   std::mt19937_64 mt(seed);
   unsigned int dist_left_border = 0;
-  unsigned int dist_right_border = 9999;
+  unsigned int dist_right_border = 999;
   std::uniform_int_distribution<unsigned int> dist(dist_left_border,
                                                    dist_right_border);
 
@@ -46,7 +46,6 @@ int main(int argc, char* argv[]) {
   // The amount of change each time for the thresholds when pity system comes into effect
   unsigned int delta_star6_threshold = probability_wrapper.calc_star6_threshold_change_step(dist_left_border, dist_right_border);
   unsigned int delta_target_star6_threshold = probability_wrapper.calc_target_star6_threshold_change_step(dist_left_border, dist_right_border);
-  std::cout << star6_threshold << ' ' << target_star6_threshold << ' ' << delta_star6_threshold << ' ' << delta_target_star6_threshold << std::endl;
 
   // Using a vector as a simple hash map to record the results.
   // Indexes as the times of pulling, values as the times as this event happens
@@ -97,12 +96,16 @@ int main(int argc, char* argv[]) {
 
   clock_gettime(CLOCK_MONOTONIC, &end);
 
+  // TODO: abstract this job as a function...
   // Print the result
   std::cout << "Time spent: " << calc_time(start, end) << "s" << std::endl;
-  std::cout << "Random seed: " << seed << std::endl;
+  std::cout << "Random seed for this simulation: " << seed << std::endl;
   std::cout << "Star 6 times: " << star6_count << std::endl;
   std::cout << "Target star 6 times: " << target_star6_count << std::endl;
-
+  
+  std::cout << "-------------------------" << std::endl;
+  
+  std::cout << "First 100 raw data:" << std::endl;
   std::cout << "\t";
   for (int i = 0; i < 10; ++i) {
     std::cout << i + 1 << ":\t";
@@ -119,25 +122,31 @@ int main(int argc, char* argv[]) {
   }
   std::cout << std::endl;
 
-  std::cout << "Rare events happend " << rare_event.size() << " times"
+  std::cout << "Rare events happend " << rare_event.size() << " times in total"
             << std::endl;
-  std::cout << "The rare events are" << std::endl;
+  std::cout << "The rare events are:" << std::endl;
+  // TODO: less likely - print limited amount of rare events when this kind of events happens many times in total under **ENOUGH** times of pull simulation
   for (const auto& p : rare_event) {
-    std::cout << "Event \"Pulling " << p.first
+    std::cout << "\tEvent \"Pulling " << p.first
               << " times to get the target star6 at the last pull\" happend "
               << p.second << " times" << std::endl;
   }
+  std::cout << std::endl;
   // TODO: make it controlled by the command line argument and give the warning if user wish to still show the estimated probability
-  std::cout << "Since the rare events are very sensitive to the error of "
-               "generated random number, the estimated probability will not be "
-               "accurate. Hence will not show the estimated probability."
-            << std::endl;
+  std::cout << "Note: Since the rare events are very sensitive to the error of the actual distribution\n"
+               "      of generated random numbers (i.e., we want a perfect uniform distribution, but\n"
+               "      there would be error under limited times of random number generation), the\n"
+               "      estimated probabilities for these rare events will not be accurate.\n" 
+               "      Hence will not show the estimated probability."
+               << std::endl;
+  
   std::cout << "-------------------------" << std::endl;
 
-  std::cout << "The estimated probability are: " << std::endl;
+  std::cout << "The estimated probabilities are (skip all non-happend events): " << std::endl;
   for (unsigned int i = 1; i < result.size(); ++i) {  // skip the unused result[0]
     if (result[i] != 0) {
-      std::cout << "Pr(Pulling " << i << " times) = " << (1.0 * result[i]) / target_star6_count << std::endl;
+      std::cout << "Pr(Pulling " << i << " times to succeed) = "
+                << (100.0 * result[i]) / target_star6_count << "%" << std::endl;
     }
   }
 
