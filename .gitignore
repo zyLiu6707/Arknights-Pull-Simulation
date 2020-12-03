@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# Executeable files
+simulation_sequential
