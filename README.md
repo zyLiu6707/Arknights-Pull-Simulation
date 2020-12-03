@@ -1,5 +1,5 @@
 # Arknights-Gacha-Simulation
-Get the probability of a **specific** 6-star operator drop using Monte Carlo method.
+Estimate the theoretical probability of a **specific** 6-star operator drop using Monte Carlo method.
 
 # About Arknights
 Some brief introduction to mobile game Arknights...
