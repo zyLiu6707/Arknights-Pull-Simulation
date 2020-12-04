@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <iostream>
 #include <unordered_map>
 
@@ -9,6 +10,7 @@ int main(int argc, char* argv[]) {
   std::mt19937_64 mt(seed);
   unsigned int dist_left_border = 0;
   unsigned int dist_right_border = 999;
+  // Uniform distribution on [0, 999]
   std::uniform_int_distribution<unsigned int> dist(dist_left_border,
                                                    dist_right_border);
 
@@ -146,7 +148,7 @@ int main(int argc, char* argv[]) {
   for (unsigned int i = 1; i < result.size(); ++i) {  // skip the unused result[0]
     if (result[i] != 0) {
       std::cout << "Pr(Pulling " << i << " times to succeed) = "
-                << (100.0 * result[i]) / target_star6_count << "%" << std::endl;
+                << (100.0 * result[i]) / target_star6_count << " %" << std::endl;
     }
   }
 
