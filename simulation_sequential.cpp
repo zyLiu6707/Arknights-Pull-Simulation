@@ -1,6 +1,5 @@
 #include <iomanip>
 
-#include "probability_wrapper.h"
 #include "utils.h"
 
 int main(int argc, char* argv[]) {
@@ -19,13 +18,23 @@ int main(int argc, char* argv[]) {
   // 3. Double rate up
   ProbabilityWrapper probability_wrapper(0.02, 0.7, 0.02, 2);
 
-  // TODO: accept command line args as rate value
-  process_cmd_input_and_set_prob_wrapper(argc, argv, probability_wrapper);
-  
-  // TODO: make it can accept command line arguments, and give prompt of possibly long time consumption!
+  // On default, the pity system will comes into effect on the 51th pull
+  // if you did not get any star6 operator in the past 50 pulls
+  unsigned int pity_starting_point = 50;
   // On default, run one billion times
   // unsigned int total_pull_time = 1000000000;
   unsigned int total_pull_time = 20000000;
+
+  // TODO: accept command line args as rate value
+  bool can_continue = process_cmd_input_and_set_corres_var(
+      argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
+  if (!can_continue) {
+    return;
+  }
+
+  // TODO: check whether can continue here!
+  // TODO: make it can accept command line arguments, and give prompt of possibly long time consumption!
+
 
   // Count the times of getting a star 6 operator in total_pull_times pulling
   unsigned int star6_count = 0;
@@ -87,7 +96,7 @@ int main(int argc, char* argv[]) {
       target_star6_threshold = init_target_star6_threshold;
     } else {
       pity_count++;
-      if (pity_count > 50) {
+      if (pity_count > pity_starting_point) {
         star6_threshold += delta_star6_threshold;
         target_star6_threshold += delta_target_star6_threshold;
       }

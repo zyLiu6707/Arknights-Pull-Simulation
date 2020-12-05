@@ -1,4 +1,4 @@
-CXX    = g++
+CXX = g++
 
 CFLAGS = -std=c++17 -O3 -pedantic -Wall -Werror
 
