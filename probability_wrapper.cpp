@@ -17,6 +17,15 @@ const unsigned int ProbabilityWrapper::get_banner_operator_num() const {
   return banner_operator_num;
 }
 
+// Setters
+void ProbabilityWrapper::set_on_banner_star6_conditional_rate(double _on_banner_star6_conditoinal_rate) {
+  on_banner_star6_conditional_rate = _on_banner_star6_conditoinal_rate;
+}
+
+void ProbabilityWrapper::set_banner_operator_num(unsigned int _banner_operator_num) {
+  banner_operator_num = _banner_operator_num;
+}
+
 // calculate the initial threshold of getting a any star 6 operator
 // based on the range of uniform int distribution
 double ProbabilityWrapper::calc_init_star6_threshold(const unsigned int dist_left_border,
