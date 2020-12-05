@@ -5,19 +5,19 @@ class ProbabilityWrapper {
  private:
   // the probability of getting a star 6 operator in one pull
   // without pity system comming into effect
-  const double base_star6_rate;
+  double base_star6_rate;
 
   // the conditional probability of up star 6 operator among all
   // star 6 operators,
   // i.e. Pr(get a on-banner star 6 operator | get a satr 6 operator)
-  const double on_banner_star6_conditional_rate;
+  double on_banner_star6_conditional_rate;
 
   // the change amount of the probability of getting a star6 operator
   // after the pity system starting to take into effect
-  const double delta_base_star6_rate;
+  double delta_base_star6_rate;
 
   // the number of on-banner operators
-  const unsigned int banner_operator_num;
+  unsigned int banner_operator_num;
 
  public:
   ProbabilityWrapper(double _base_star6_rate,
@@ -30,13 +30,18 @@ class ProbabilityWrapper {
         banner_operator_num(_banner_operator_num){};
 
   // Getters
-  const double get_base_star6_rate();
+  const double get_base_star6_rate() const;
 
-  const double get_on_banner_star6_conditional_rate();
+  const double get_on_banner_star6_conditional_rate() const;
 
-  const double get_delta_star6_base_rate();
+  const double get_delta_star6_base_rate() const;
 
-  const unsigned int get_banner_operator_num();
+  const unsigned int get_banner_operator_num() const;
+
+  // Setters
+  void set_on_banner_star6_conditional_rate(double _on_banner_star6_conditoinal_rate);
+
+  void set_banner_operator_num(unsigned int _banner_operator_num);
 
   // calculate the initial threshold of getting a any star 6 operator
   // based on the range of uniform int distribution

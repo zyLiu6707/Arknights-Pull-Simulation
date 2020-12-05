@@ -1,6 +1,4 @@
 #include <iomanip>
-#include <iostream>
-#include <unordered_map>
 
 #include "probability_wrapper.h"
 #include "utils.h"
@@ -14,15 +12,15 @@ int main(int argc, char* argv[]) {
   std::uniform_int_distribution<unsigned int> dist(dist_left_border,
                                                    dist_right_border);
 
-  // TODO: accept command line args as rate value
-  // process_command_line_input();
-
   // On default, will calculate the probability of a limited banner (e.g.,
-  // Nian, W and Rosmontis banner), which uses the following probability
-  // parameter: 
-  // Pr(get a star6 operator): 2% 
-  // Pr(get a on-banner star 6 operator | get a satr 6 operator): 70%
+  // Nian, W and Rosmontis banner), which uses the following parameter: 
+  // 1. Pr(get a star6 operator): 2% 
+  // 2. Pr(get a on-banner star 6 operator | get a satr 6 operator): 70%
+  // 3. Double rate up
   ProbabilityWrapper probability_wrapper(0.02, 0.7, 0.02, 2);
+
+  // TODO: accept command line args as rate value
+  process_cmd_input_and_set_prob_wrapper(argc, argv, probability_wrapper);
   
   // TODO: make it can accept command line arguments, and give prompt of possibly long time consumption!
   // On default, run one billion times

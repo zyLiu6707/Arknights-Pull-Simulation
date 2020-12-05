@@ -1,19 +1,19 @@
 #include "probability_wrapper.h"
 
 // Getters
-const double ProbabilityWrapper::get_base_star6_rate() {
+const double ProbabilityWrapper::get_base_star6_rate() const {
   return base_star6_rate;
 }
 
-const double ProbabilityWrapper::get_on_banner_star6_conditional_rate() {
+const double ProbabilityWrapper::get_on_banner_star6_conditional_rate() const {
   return on_banner_star6_conditional_rate;
 }
 
-const double ProbabilityWrapper::get_delta_star6_base_rate() {
+const double ProbabilityWrapper::get_delta_star6_base_rate() const {
   return delta_base_star6_rate;
 }
 
-const unsigned int ProbabilityWrapper::get_banner_operator_num() {
+const unsigned int ProbabilityWrapper::get_banner_operator_num() const {
   return banner_operator_num;
 }
 
