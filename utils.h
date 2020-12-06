@@ -84,6 +84,9 @@ void display_help_message() {
 void display_error_detail(const ErrorFlag& error_flag) {
   if (error_flag.check_err()) {
     std::cerr << "The provided command line arguments are invalid due to the following error(s):\n";
+    if (error_flag.err_unexpected_arguments_at_the_beginning) {
+      std::cerr << "\tUnexpected argument(s) at the beginning\n";
+    }
     // Redundant argument error
     if (error_flag.err_redundant_identical_ctrl_arg_flag) {
       std::cerr << "\tSame arguments are specified more than once\n";
@@ -194,7 +197,10 @@ bool process_cmd_input_and_set_corres_var(
 
   // Argument error priority order:
   // too many arg > redundant arg > conflict arg > missing value > invalid value
-
+  // Check whether the first argument (i.e., argv[1]) is invalid
+  if (expected_control_arg.find(std::string(argv[1])) == expected_control_arg.end()) {
+    error_flag.err_unexpected_arguments_at_the_beginning = true;
+  }
   // Check another situation of redundant control arguments
   if (arg_map.find("-t") != arg_map.end() &&
       arg_map.find("--total-pull-time") != arg_map.end()) {

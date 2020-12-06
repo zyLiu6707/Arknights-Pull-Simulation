@@ -14,6 +14,7 @@ class ErrorFlag {
   bool err_missing_value_for_ctrl_arg_pity_flag;
   bool err_unexpected_value_for_ctrl_arg_limited;
   bool err_unexpected_value_for_ctrl_arg_regular;
+  bool err_unexpected_arguments_at_the_beginning;
 
   ErrorFlag()
       : err_redundant_identical_ctrl_arg_flag(false),
@@ -25,7 +26,8 @@ class ErrorFlag {
         err_invalid_value_for_ctrl_arg_pity_flag(false),
         err_missing_value_for_ctrl_arg_pity_flag(false),
         err_unexpected_value_for_ctrl_arg_limited(false),
-        err_unexpected_value_for_ctrl_arg_regular(false) {}
+        err_unexpected_value_for_ctrl_arg_regular(false),
+        err_unexpected_arguments_at_the_beginning(false) {}
 
   // Return true if any kinds of error occurs
   bool check_err() const {
@@ -38,7 +40,8 @@ class ErrorFlag {
            err_invalid_value_for_ctrl_arg_pity_flag ||
            err_missing_value_for_ctrl_arg_pity_flag ||
            err_unexpected_value_for_ctrl_arg_limited ||
-           err_unexpected_value_for_ctrl_arg_regular;
+           err_unexpected_value_for_ctrl_arg_regular ||
+           err_unexpected_arguments_at_the_beginning;
   }
 };
 
