@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   bool can_continue = process_cmd_input_and_set_corres_var(
       argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
   if (!can_continue) {
-    return;
+    return 0;
   }
 
   // TODO: check whether can continue here!

@@ -71,7 +71,7 @@ void display_help_message() {
                "            Cannot be specified with --limited at the same time\n"
                "--limited : Simulation and get the estimated probability in a limited banner\n"
                "            Cannot be specified with --regular at the same time\n"
-               "--pity : Set the starting point where the pity system comes into effect\n"
+               "--pity : Set the starting point where the pity system comes into effect,\n"
                "         i.e., you will get a higher probability on the specified pull's next pull"
                // TODO: add the -n|--on-banner-num arguments introduction!
                << std::endl;
