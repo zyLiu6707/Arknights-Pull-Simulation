@@ -33,3 +33,6 @@
 
 # Executeable files
 simulation_sequential
+
+# Unitest executable files
+test/cmd_parse_unitest
