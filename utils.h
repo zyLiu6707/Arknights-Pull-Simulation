@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <assert.h>
 #include <time.h>
 
 #include <iostream>
@@ -10,10 +11,30 @@
 #include <unordered_set>
 
 #include "error_flag.h"
+#include "probability_wrapper.h"
 
 // Pre-defined parameters for Arknights
 const double limited_banner_on_banner_star6_conditional_rate = 0.7;
 const double regular_banner_on_banner_star6_conditional_rate = 0.5;
+
+/* For debugging purpose */
+// Print the content in arg_map
+#ifdef DEBUG
+void print_arg_map_contents(
+    const std::unordered_map<std::string, std::vector<std::string>>& arg_map) {
+  std::cout << "\n----- Arguments Map: -----\n";
+  std::cout << "Map Size = " << arg_map.size() << std::endl;
+  std::cout << "Key\t\tValue\n";
+  for (auto it_kv = arg_map.cbegin(); it_kv != arg_map.cend(); ++it_kv) {
+    std::cout << it_kv->first << "\t\t";
+    for (auto& s : it_kv->second) {
+      std::cout << s << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+}
+#endif
 
 // calculate the time interval between start and end
 // return the result in second
@@ -29,6 +50,8 @@ double calc_time(const struct timespec& start, const struct timespec& end) {
   }
 }
 
+// Generate a random number using random_device to make sure the seed
+// is different each time in each Monte Carlo simulation
 auto get_random_seed() {
   std::random_device rd;  // uses RDRND or /dev/urandom
                           // if you want use a specific token, do not use
@@ -38,28 +61,87 @@ auto get_random_seed() {
   return random_seed;
 }
 
-
-// int check_and_convert_to_int() {}
-
-// TODO: finish this
+// Display the help message
 void display_help_message() {
-  std::cout << "Usage:" << std::endl;
-  exit(EXIT_SUCCESS);
+  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>]\n"
+               "--help : Display the help message\n"
+               "--t|--total-pull-time : Set the time of pulling in a simulation\n"
+               "                        Note : this is not the experiment time\n"
+               "--regular : Simulation and get the estimated probability in a regular banner\n"
+               "            Cannot be specified with --limited at the same time\n"
+               "--limited : Simulation and get the estimated probability in a limited banner\n"
+               "            Cannot be specified with --regular at the same time\n"
+               "--pity : Set the starting point where the pity system comes into effect\n"
+               "         i.e., you will get a higher probability on the specified pull's next pull"
+               // TODO: add the -n|--on-banner-num arguments introduction!
+               << std::endl;
+
+  // // TODO: Check memory leaks here!
+  // exit(EXIT_SUCCESS);
+  return;
 }
 
-// void display_error_message(const ErrorFlag& error_flag) {
-//   display_help_message();
-// }
+void display_error_detail(const ErrorFlag& error_flag) {
+  if (error_flag.check_err()) {
+    std::cerr << "The provided command line arguments are invalid due to the following error(s):\n";
+    // Redundant argument error
+    if (error_flag.err_redundant_identical_ctrl_arg_flag) {
+      std::cerr << "\tSame arguments are specified more than once\n";
+    }
+    if (error_flag.err_redundant_total_pull_time_ctrl_arg_flag) {
+      std::cerr << "\tRedundant arguments: \"-t\" and \"--total-pull-time\" are specified at the same time\n";
+    }
+    if (error_flag.err_redundant_pity_ctrl_arg_flag) {
+      std::cerr << "\tRedundant arguments: \"-p\" and \"--pity\" are specified at the same time\n";
+    }
+    // Conflict arguments error
+    if (error_flag.err_conflict_ctrl_arg_flag) {
+      std::cerr << "\tConflict arguments: \"--regular\" and \"--limited\" are specified at the same time\n";
+    }
+    // Missing detail value
+    if (error_flag.err_missing_value_for_ctrl_arg_total_pull_time_flag) {
+      std::cerr << "\tMissing value for \"-t (or --total-pull-time)\"\n";
+    }
+    if (error_flag.err_missing_value_for_ctrl_arg_pity_flag) {
+      std::cerr << "\tMissing value for \"-p (or --pity)\"\n";
+    }
+    // Invalid value
+    if (error_flag.err_invalid_value_for_ctrl_arg_total_pull_time_flag) {
+      std::cerr << "\tInvalid value for \"-t (or --total-pull-time)\" - it must be a positive integer\n";
+    }
+    if (error_flag.err_invalid_value_for_ctrl_arg_pity_flag) {
+      std::cerr << "\tInvalid value for \"-p (or --pity)\" - it must be a non-negative integer\n";
+    }
+    if (error_flag.err_unexpected_value_for_ctrl_arg_regular) {
+      std::cerr << "\tUnexpected value for \"--regular\"\n";
+    }
+    if (error_flag.err_unexpected_value_for_ctrl_arg_limited) {
+      std::cerr << "\tUnexpected value for \"--limited\"\n";
+    }
+    std::cerr << "Please check and correct the error(s)\nYou can refer to help message, README, or visit the online repo:\n"
+                 "https://github.com/zyLiu6707/Arknights-Gacha-Simulation\n" << std::endl;
+    display_help_message();
+  }
+}
 
 // TODO: finish this!
-void process_cmd_input_and_set_prob_wrapper(int argc, char* argv[], ProbabilityWrapper& probability_wrapper) {
+// Read the command line inputs, check the potential errors
+// If the input is valid, set the corresponding field in ProbabilityWrapper
+// and other variables
+// Return a bool flag with true value if the input is valid, which indicate
+// the main simulation program continue run
+bool process_cmd_input_and_set_corres_var(
+    int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
+    unsigned int& total_pull_time, unsigned int& pity_starting_point) {
   const int expected_max_arg_num = 6;
   if (argc > expected_max_arg_num) {
     std::cerr << "Too many arguments!" << std::endl;
     display_help_message();
+    return false;
   }
   if (argc == 1) {
     display_help_message();
+    return false;
   }
 
   // Control arguments are those that can specify the behavior of the
@@ -81,6 +163,10 @@ void process_cmd_input_and_set_prob_wrapper(int argc, char* argv[], ProbabilityW
   for (int i = 1; i < argc; ++i) {
     if (expected_control_arg.find(argv[i]) != expected_control_arg.end()) {
       if (arg_map.count(argv[i]) == 0) {
+        // For arguments that do not need a detailed value, i.e., --help,
+        // --regular and --limited, just put an empty vector of string
+        // along with this key
+        arg_map[argv[i]];
         for (int j = i + 1; j < argc; ++j) {
           if (expected_control_arg.find(argv[j]) != expected_control_arg.end()) {
             break;
@@ -95,9 +181,15 @@ void process_cmd_input_and_set_prob_wrapper(int argc, char* argv[], ProbabilityW
       }
     }
   }
+
+#ifdef DEBUG  // this function will be executed when debugging
+  print_arg_map_contents(arg_map);
+#endif
+
   // If --help is specified, ignore all other arguments and print the help message
   if (arg_map.find("--help") != arg_map.end()) {
     display_help_message();
+    return false;
   }
 
   // Argument error priority order:
@@ -128,49 +220,75 @@ void process_cmd_input_and_set_prob_wrapper(int argc, char* argv[], ProbabilityW
   }
   const auto it_pity = arg_map.count("-p") == 1 ? arg_map.find("-p") : arg_map.find("--pity");
   if (it_pity != arg_map.cend() && it_pity->second.size() == 0) {
-    error_flag.err_missing_value_for_ctrl_arg_total_pull_time_flag = true;
+    error_flag.err_missing_value_for_ctrl_arg_pity_flag = true;
   }
 
   // Check the format of specific value for control arguments that need one,
   // i.e., -t/--total-pull-time, -p/--pity
   // the specific values are required to be positive integer; If the format is
   // correct, then retrieve the argument value
-  long int total_pull_time = -1;
+  long int total_pull_time_temp = -1;
   if (it_total_pull_time != arg_map.cend()) {
     if (it_total_pull_time->second.size() > 1) {
       error_flag.err_invalid_value_for_ctrl_arg_total_pull_time_flag = true;
-    } else {
+    } else if (it_total_pull_time->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
-      total_pull_time = strtol(it_total_pull_time->second[0].c_str(), &p_end, 10);
-      if (*p_end != '\0' || total_pull_time < 0) {
+      total_pull_time_temp = strtol(it_total_pull_time->second[0].c_str(), &p_end, 10);
+      if (*p_end != '\0' || total_pull_time_temp <= 0) {
         error_flag.err_invalid_value_for_ctrl_arg_total_pull_time_flag = true;
       }
     }
   }
-  long int pity_starting = -1;
+  long int pity_starting_temp = -1;
   if (it_pity != arg_map.cend()) {
     if (it_pity->second.size() > 1) {
       error_flag.err_invalid_value_for_ctrl_arg_pity_flag = true;
-    } else {
+    } else if (it_pity->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
-      pity_starting = strtol(it_pity->second[0].c_str(), &p_end, 10);
-      if (*p_end != '\0' || pity_starting < 0) {
+      pity_starting_temp = strtol(it_pity->second[0].c_str(), &p_end, 10);
+      if (*p_end != '\0' || pity_starting_temp < 0) {
         error_flag.err_invalid_value_for_ctrl_arg_pity_flag = true;
       }
     }
   }
 
-  // TODO: deal with different errors here
-  // display_error_message(error_flag);
+  // Check whether there is unexpected values for the control arguments
+  // --regular and --limited
+  if (arg_map.count("--regular") == 1 && arg_map["--regular"].size() != 0) {
+    error_flag.err_unexpected_value_for_ctrl_arg_regular = true;
+  }
+  if (arg_map.count("--limited") == 1 && arg_map["--limited"].size() != 0) {
+    error_flag.err_unexpected_value_for_ctrl_arg_limited = true;
+  }
+
+  display_error_detail(error_flag);
 
   // Command line input is valid, now set the ProbabilityWrapper
-  if (arg_map.find("--regular") != arg_map.end()) {
-    probability_wrapper.set_on_banner_star6_conditional_rate(
-        limited_banner_on_banner_star6_conditional_rate);
-  } else if (arg_map.find("--limited") != arg_map.end()) {
-    probability_wrapper.set_on_banner_star6_conditional_rate(
-        regular_banner_on_banner_star6_conditional_rate);
+  if (!error_flag.check_err()) {
+    if (arg_map.find("--regular") != arg_map.end()) {
+      probability_wrapper.set_on_banner_star6_conditional_rate(
+          regular_banner_on_banner_star6_conditional_rate);
+    } else if (arg_map.find("--limited") != arg_map.end()) {
+      probability_wrapper.set_on_banner_star6_conditional_rate(
+          limited_banner_on_banner_star6_conditional_rate);
+    }
+    if (it_total_pull_time != arg_map.cend()) {
+      // Should ony has one element
+      // DEBUG
+      // std::cout << "-t vector size = " << it_total_pull_time->second.size() << std::endl;
+      assert(it_total_pull_time->second.size() == 1);
+      total_pull_time = total_pull_time_temp;
+    }
+    if (it_pity != arg_map.cend()) {
+      // Should only has one element
+      // DEBUG
+      // std::cout << "-p vector size = " << it_pity->second.size() << std::endl;
+      assert(it_pity->second.size() == 1);
+      pity_starting_point = pity_starting_temp;
+    }
   }
+
+  return !error_flag.check_err();
 }
 
 #endif  // UTILS_H
