@@ -3,14 +3,7 @@
 #include "utils.h"
 
 int main(int argc, char* argv[]) {
-  unsigned int seed = get_random_seed();
-  std::mt19937_64 mt(seed);
-  unsigned int dist_left_border = 0;
-  unsigned int dist_right_border = 999;
-  // Uniform distribution on [0, 999]
-  std::uniform_int_distribution<unsigned int> dist(dist_left_border,
-                                                   dist_right_border);
-
+  // TODO: adjust this logic to corperate with cmd line arg rules
   // On default, will calculate the probability of a limited banner (e.g.,
   // Nian, W and Rosmontis banner), which uses the following parameter: 
   // 1. Pr(get a star6 operator): 2% 
@@ -22,6 +15,7 @@ int main(int argc, char* argv[]) {
   // if you did not get any star6 operator in the past 50 pulls
   unsigned int pity_starting_point = 50;
   // On default, run one billion times
+  // TODO: when finish single-thread version, restore the change here
   // unsigned int total_pull_time = 1000000000;
   unsigned int total_pull_time = 20000000;
 
@@ -32,9 +26,14 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  // TODO: check whether can continue here!
   // TODO: make it can accept command line arguments, and give prompt of possibly long time consumption!
-
+  unsigned int seed = get_random_seed();
+  std::mt19937_64 mt(seed);
+  unsigned int dist_left_border = 0;
+  unsigned int dist_right_border = 999;
+  // Uniform distribution on [0, 999]
+  std::uniform_int_distribution<unsigned int> dist(dist_left_border,
+                                                   dist_right_border);
 
   // Count the times of getting a star 6 operator in total_pull_times pulling
   unsigned int star6_count = 0;
@@ -104,60 +103,10 @@ int main(int argc, char* argv[]) {
   }
 
   clock_gettime(CLOCK_MONOTONIC, &end);
-
-  // TODO: abstract this job as a function...
+  
   // Print the result
-  std::cout << "Time spent: " << calc_time(start, end) << "s" << std::endl;
-  std::cout << "Random seed for this simulation: " << seed << std::endl;
-  std::cout << "Star 6 times: " << star6_count << std::endl;
-  std::cout << "Target star 6 times: " << target_star6_count << std::endl;
-  
-  std::cout << "-------------------------" << std::endl;
-  
-  std::cout << "First 100 raw data:" << std::endl;
-  std::cout << "\t";
-  for (int i = 0; i < 10; ++i) {
-    std::cout << i + 1 << ":\t";
-  }
-  std::cout << std::endl;
-  for (unsigned int i = 0; i < 100; ++i) {
-    if (i % 10 == 0) {
-      std::cout << i / 10 + 1 << ":\t";
-    }
-    std::cout << result[i] << '\t';
-    if (i % 10 == 9) {
-      std::cout << std::endl;
-    }
-  }
-  std::cout << std::endl;
-
-  std::cout << "Rare events happend " << rare_event.size() << " times in total"
-            << std::endl;
-  std::cout << "The rare events are:" << std::endl;
-  // TODO: less likely - print limited amount of rare events when this kind of events happens many times in total under **ENOUGH** times of pull simulation
-  for (const auto& p : rare_event) {
-    std::cout << "\tEvent \"Pulling " << p.first
-              << " times to get the target star6 at the last pull\" happend "
-              << p.second << " times" << std::endl;
-  }
-  std::cout << std::endl;
-  // TODO: make it controlled by the command line argument and give the warning if user wish to still show the estimated probability
-  std::cout << "Note: Since the rare events are very sensitive to the error of the actual distribution\n"
-               "      of generated random numbers (i.e., we want a perfect uniform distribution, but\n"
-               "      there would be error under limited times of random number generation), the\n"
-               "      estimated probabilities for these rare events will not be accurate.\n" 
-               "      Hence will not show the estimated probability."
-               << std::endl;
-  
-  std::cout << "-------------------------" << std::endl;
-
-  std::cout << "The estimated probabilities are (skip all non-happend events): " << std::endl;
-  for (unsigned int i = 1; i < result.size(); ++i) {  // skip the unused result[0]
-    if (result[i] != 0) {
-      std::cout << "Pr(Pulling " << i << " times to succeed) = "
-                << (100.0 * result[i]) / target_star6_count << " %" << std::endl;
-    }
-  }
+  display_simulation_results(result, rare_event, star6_count,
+                             target_star6_count, seed, start, end);
 
   return 0;
 }

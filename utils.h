@@ -128,11 +128,11 @@ void display_error_detail(const ErrorFlag& error_flag) {
 }
 
 // TODO: finish this!
-// Read the command line inputs, check the potential errors
+// Read the command line inputs, check the potential errors.
 // If the input is valid, set the corresponding field in ProbabilityWrapper
-// and other variables
-// Return a bool flag with true value if the input is valid, which indicate
-// the main simulation program continue run
+// and other variables.
+// Return a bool flag with true value if the input is valid, which will 
+// indicates the main simulation program whether can continue running
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
     unsigned int& total_pull_time, unsigned int& pity_starting_point) {
@@ -295,6 +295,78 @@ bool process_cmd_input_and_set_corres_var(
   }
 
   return !error_flag.check_err();
+}
+
+// Display the simulation results
+void display_simulation_results(
+    const std::vector<unsigned int>& result,
+    std::unordered_map<unsigned int, unsigned int>& rare_event,
+    unsigned int star6_count, unsigned int target_star6_count,
+    unsigned int seed, const struct timespec& start,
+    const struct timespec& end) {
+  std::cout << "Time spent: " << calc_time(start, end) << "s" << std::endl;
+  std::cout << "Random seed for this simulation: " << seed << std::endl;
+  std::cout << "Star 6 times: " << star6_count << std::endl;
+  std::cout << "Target star 6 times: " << target_star6_count << std::endl;
+
+  std::cout << "-------------------------" << std::endl;
+
+  std::cout << "First 100 raw data:" << std::endl;
+  std::cout << "\t";
+  for (int i = 0; i < 10; ++i) {
+    std::cout << i + 1 << ":\t";
+  }
+  std::cout << std::endl;
+  for (unsigned int i = 0; i < 100; ++i) {
+    if (i % 10 == 0) {
+      std::cout << i / 10 + 1 << ":\t";
+    }
+    std::cout << result[i] << '\t';
+    if (i % 10 == 9) {
+      std::cout << std::endl;
+    }
+  }
+  std::cout << std::endl;
+
+  std::cout << "Rare events happend " << rare_event.size() << " times in total"
+            << std::endl;
+  if (rare_event.size() != 0) {
+    std::cout << "The rare events are:" << std::endl;
+  }
+  // TODO: less likely - print limited amount of rare events when this kind of
+  // events happens many times in total under **ENOUGH** times of pull
+  // simulation
+  for (const auto& p : rare_event) {
+    std::cout << "\tEvent \"Pulling " << p.first
+              << " times to get the target star6 at the last pull\" happend "
+              << p.second << " times" << std::endl;
+  }
+  std::cout << std::endl;
+  // TODO: make it controlled by the command line argument and give the warning
+  // if user wish to still show the estimated probability
+  std::cout << "Note: Since the rare events are very sensitive to the error of "
+               "the actual distribution\n"
+               "      of generated random numbers (i.e., we want a perfect "
+               "uniform distribution, but\n"
+               "      there would be error under limited times of random "
+               "number generation), the\n"
+               "      estimated probabilities for these rare events will not "
+               "be accurate.\n"
+               "      Hence will not show the estimated probabilities of those rare events."
+            << std::endl;
+
+  std::cout << "-------------------------" << std::endl;
+
+  std::cout << "The estimated probabilities are (skip all non-happend events): "
+            << std::endl;
+  for (unsigned int i = 1; i < result.size();
+       ++i) {  // skip the unused result[0]
+    if (result[i] != 0) {
+      std::cout << "Pr(Pulling " << i << " times to succeed) = "
+                << (100.0 * result[i]) / target_star6_count << " %"
+                << std::endl;
+    }
+  }
 }
 
 #endif  // UTILS_H
