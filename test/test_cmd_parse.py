@@ -75,7 +75,7 @@ test_case = [["./cmd_parse_unitest", "0"]
     , ["./cmd_parse_unitest -help", "0"]
     , ["./cmd_parse_unitest --", "0"]
     , ["./cmd_parse_unitest --help 2", "0"]
-             ]
+]
 
 if __name__ == "__main__":
 
