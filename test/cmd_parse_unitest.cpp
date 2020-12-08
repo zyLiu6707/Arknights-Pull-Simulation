@@ -1,5 +1,3 @@
-#include "../error_flag.h"
-#include "../probability_wrapper.h"
 #include "../utils.h"
 
 int main(int argc, char* argv[]) {
