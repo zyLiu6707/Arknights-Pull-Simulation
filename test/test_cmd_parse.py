@@ -81,20 +81,20 @@ if __name__ == "__main__":
 
     # Run all test cases
     failed_case_index = []
-    for case in range(1, 5):
-        print("Test Case {case_num}".format(case_num=case))
+    for i in range(len(test_case)):
+        print("Test Case {case_num}".format(case_num=i))
         # print(test_case[case])
         # shell=True here for easier passing the cmd arguments in subprocess.run()
         proc = subprocess.run(
-            [test_case[case][0]], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            [test_case[i][0]], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         output = proc.stdout.decode()
         index = output.find(result_keywords)
         result = output[index + len(result_keywords)]
-        print("Case {case_num}: result = {result}, expect {expect}".format(case_num=case, result=result,
-                                                                           expect=test_case[case][1]), end=", ")
-        if result != test_case[case][1]:
+        print("Case {case_num}: result = {result}, expect {expect}".format(case_num=i, result=result,
+                                                                           expect=test_case[i][1]), end=", ")
+        if result != test_case[i][1]:
             print("Case failed!")
-            failed_case_index.append(case)
+            failed_case_index.append(i)
         else:
             print("Pass")
 
@@ -111,8 +111,9 @@ if __name__ == "__main__":
         print()
         print("All test cases passed, now starting to check memory leak.")
         print()
-        for case in range(1, 5):
-            valgrind_cmd_str = "valgrind" + " " + valgrind_flag + " " + test_case[case][0]
+        for i in range(len(test_case)):
+            print("Check leak for case {case_num}".format(case_num=i))
+            valgrind_cmd_str = "valgrind" + " " + valgrind_flag + " " + test_case[i][0]
             # The valgrind will output the program output to stdout, and the message 
             # from valgrind itself to stderr, so here the stderr=subprocess.STDOUT to
             # combine these two streams together
@@ -121,7 +122,7 @@ if __name__ == "__main__":
             output = proc.stdout.decode()
             index = output.find(valgrind_keywords)
             if index == -1:
-                print("***** Case {case_num} has memory leak! *****".format(case_num=case))
+                print("***** Case {case_num} has memory leak! *****".format(case_num=i))
                 print(output)
                 print(
                     "The remaining test cases memory leak will not be checked, please fix the current memory leaking.")
