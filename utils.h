@@ -22,7 +22,7 @@ const double regular_banner_on_banner_star6_conditional_rate = 0.5;
 #ifdef DEBUG
 void print_arg_map_contents(
     const std::unordered_map<std::string, std::vector<std::string>>& arg_map) {
-  std::cout << "\n----- Arguments Map: -----\n";
+  std::cout << "\nArguments Map:\n";
   std::cout << "Map Size = " << arg_map.size() << std::endl;
   std::cout << "Key\t\tValue\n";
   for (auto it_kv = arg_map.cbegin(); it_kv != arg_map.cend(); ++it_kv) {
@@ -32,7 +32,6 @@ void print_arg_map_contents(
     }
     std::cout << std::endl;
   }
-  std::cout << std::endl;
 }
 #endif
 
