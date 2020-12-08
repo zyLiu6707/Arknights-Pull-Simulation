@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <random>
-#include <string>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -83,17 +82,30 @@ void display_help_message() {
 void display_error_detail(const ErrorFlag& error_flag) {
   if (error_flag.check_err()) {
     std::cerr << "The provided command line arguments are invalid due to the following error(s):\n";
+    if (error_flag.err_help_ctrl_arg_with_other_args) {
+      std::cerr << "\tIf you would like to see help message, please ony specify \"--help\"\n";
+      std::cerr << "\tOther arguments are ignored. Will not run the simulation.\n";
+      // Ignore other args and potential errors, aborting the program
+      return;
+    }
+    if (error_flag.err_invalid_ctrl_args) {
+      std::cerr << "\tInvalid arguments: ";
+      for (const auto& invalid_arg : error_flag.invalid_ctrl_args_list) {
+        std::cerr << invalid_arg << " ";
+      }
+      std::cerr << std::endl;
+    }
     if (error_flag.err_unexpected_arguments_at_the_beginning) {
       std::cerr << "\tUnexpected argument(s) at the beginning\n";
     }
     // Redundant argument error
-    if (error_flag.err_redundant_identical_ctrl_arg_flag) {
+    if (error_flag.err_redundant_identical_ctrl_arg) {
       std::cerr << "\tSame arguments are specified more than once\n";
     }
-    if (error_flag.err_redundant_total_pull_time_ctrl_arg_flag) {
+    if (error_flag.err_redundant_total_pull_time_ctrl_arg) {
       std::cerr << "\tRedundant arguments: \"-t\" and \"--total-pull-time\" are specified at the same time\n";
     }
-    if (error_flag.err_redundant_pity_ctrl_arg_flag) {
+    if (error_flag.err_redundant_pity_ctrl_arg) {
       std::cerr << "\tRedundant arguments: \"-p\" and \"--pity\" are specified at the same time\n";
     }
     // Conflict arguments error
@@ -101,17 +113,17 @@ void display_error_detail(const ErrorFlag& error_flag) {
       std::cerr << "\tConflict arguments: \"--regular\" and \"--limited\" are specified at the same time\n";
     }
     // Missing detail value
-    if (error_flag.err_missing_value_for_ctrl_arg_total_pull_time_flag) {
+    if (error_flag.err_missing_value_for_ctrl_arg_total_pull_time) {
       std::cerr << "\tMissing value for \"-t (or --total-pull-time)\"\n";
     }
-    if (error_flag.err_missing_value_for_ctrl_arg_pity_flag) {
+    if (error_flag.err_missing_value_for_ctrl_arg_pity) {
       std::cerr << "\tMissing value for \"-p (or --pity)\"\n";
     }
     // Invalid value
-    if (error_flag.err_invalid_value_for_ctrl_arg_total_pull_time_flag) {
+    if (error_flag.err_invalid_value_for_ctrl_arg_total_pull_time) {
       std::cerr << "\tInvalid value for \"-t (or --total-pull-time)\" - it must be a positive integer\n";
     }
-    if (error_flag.err_invalid_value_for_ctrl_arg_pity_flag) {
+    if (error_flag.err_invalid_value_for_ctrl_arg_pity) {
       std::cerr << "\tInvalid value for \"-p (or --pity)\" - it must be a non-negative integer\n";
     }
     if (error_flag.err_unexpected_value_for_ctrl_arg_regular) {
@@ -178,9 +190,13 @@ bool process_cmd_input_and_set_corres_var(
       } 
       else {
         // Situation that exact same control arg appears more than once
-        error_flag.err_redundant_identical_ctrl_arg_flag = true;
+        error_flag.err_redundant_identical_ctrl_arg = true;
         //break;
       }
+    }
+    else {
+      error_flag.err_invalid_ctrl_args = true;
+      error_flag.invalid_ctrl_args_list.push_back(argv[i]);
     }
   }
 
@@ -190,8 +206,13 @@ bool process_cmd_input_and_set_corres_var(
 
   // If --help is specified, ignore all other arguments and print the help message
   if (arg_map.find("--help") != arg_map.end()) {
-    display_help_message();
-    return false;
+    if (argc == 2) {
+      display_help_message();
+      return false;
+    }
+    else {
+      error_flag.err_help_ctrl_arg_with_other_args = true;
+    }
   }
 
   // Argument error priority order:
@@ -203,11 +224,11 @@ bool process_cmd_input_and_set_corres_var(
   // Check another situation of redundant control arguments
   if (arg_map.find("-t") != arg_map.end() &&
       arg_map.find("--total-pull-time") != arg_map.end()) {
-    error_flag.err_redundant_total_pull_time_ctrl_arg_flag = true;
+    error_flag.err_redundant_total_pull_time_ctrl_arg = true;
   }
   if (arg_map.find("-p") != arg_map.end() &&
       arg_map.find("--pity") != arg_map.end()) {
-    error_flag.err_redundant_pity_ctrl_arg_flag = true;
+    error_flag.err_redundant_pity_ctrl_arg = true;
   }
 
   // Check whether conflict control arguments are provided,
@@ -221,11 +242,11 @@ bool process_cmd_input_and_set_corres_var(
   // i.e., -t/--total-pull-time, -p/--pity
   const auto it_total_pull_time = arg_map.count("-t") == 1 ? arg_map.find("-t") : arg_map.find("--total-pull-time");
   if (it_total_pull_time != arg_map.cend() && it_total_pull_time->second.size() == 0) {
-    error_flag.err_missing_value_for_ctrl_arg_total_pull_time_flag = true;
+    error_flag.err_missing_value_for_ctrl_arg_total_pull_time = true;
   }
   const auto it_pity = arg_map.count("-p") == 1 ? arg_map.find("-p") : arg_map.find("--pity");
   if (it_pity != arg_map.cend() && it_pity->second.size() == 0) {
-    error_flag.err_missing_value_for_ctrl_arg_pity_flag = true;
+    error_flag.err_missing_value_for_ctrl_arg_pity = true;
   }
 
   // Check the format of specific value for control arguments that need one,
@@ -235,24 +256,24 @@ bool process_cmd_input_and_set_corres_var(
   long int total_pull_time_temp = -1;
   if (it_total_pull_time != arg_map.cend()) {
     if (it_total_pull_time->second.size() > 1) {
-      error_flag.err_invalid_value_for_ctrl_arg_total_pull_time_flag = true;
+      error_flag.err_invalid_value_for_ctrl_arg_total_pull_time = true;
     } else if (it_total_pull_time->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
       total_pull_time_temp = strtol(it_total_pull_time->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || total_pull_time_temp <= 0) {
-        error_flag.err_invalid_value_for_ctrl_arg_total_pull_time_flag = true;
+        error_flag.err_invalid_value_for_ctrl_arg_total_pull_time = true;
       }
     }
   }
   long int pity_starting_temp = -1;
   if (it_pity != arg_map.cend()) {
     if (it_pity->second.size() > 1) {
-      error_flag.err_invalid_value_for_ctrl_arg_pity_flag = true;
+      error_flag.err_invalid_value_for_ctrl_arg_pity = true;
     } else if (it_pity->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
       pity_starting_temp = strtol(it_pity->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || pity_starting_temp < 0) {
-        error_flag.err_invalid_value_for_ctrl_arg_pity_flag = true;
+        error_flag.err_invalid_value_for_ctrl_arg_pity = true;
       }
     }
   }
