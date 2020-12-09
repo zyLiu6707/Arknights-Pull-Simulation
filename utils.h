@@ -61,7 +61,7 @@ auto get_random_seed() {
 
 // Display the help message
 void display_help_message() {
-  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>]\n"
+  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n"
                "--help : Display the help message\n"
                "--t|--total-pull-time : Set the time of pulling in a simulation\n"
                "                        Note : this is not the experiment time\n"
@@ -70,8 +70,9 @@ void display_help_message() {
                "--limited : Simulation and get the estimated probability in a limited banner\n"
                "            Cannot be specified with --regular at the same time\n"
                "--pity : Set the starting point where the pity system comes into effect,\n"
-               "         i.e., you will get a higher probability on the specified pull's next pull"
-               // TODO: add the -n|--on-banner-num arguments introduction!
+               "         i.e., you will get a higher probability on the specified pull's next pull\n"
+               "-n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"
+               "                   The valid values are 1 and 2\n"
                << std::endl;
 
   return;
@@ -96,7 +97,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_unexpected_arguments_at_the_beginning) {
       std::cerr << "\tUnexpected argument(s) at the beginning\n";
     }
-    // Redundant argument error
+    // Redundant argument
     if (error_flag.err_redundant_identical_ctrl_arg) {
       std::cerr << "\tSame arguments are specified more than once\n";
     }
@@ -106,7 +107,10 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_redundant_pity_ctrl_arg) {
       std::cerr << "\tRedundant arguments: \"-p\" and \"--pity\" are specified at the same time\n";
     }
-    // Conflict arguments error
+    if (error_flag.err_redundant_rate_up_num_ctrl_arg) {
+      std::cerr << "\tRedundant arguments: \"-n\" and \"--num-rate-up\" are specified at the same time\n";
+    }
+    // Conflict arguments
     if (error_flag.err_conflict_ctrl_arg_flag) {
       std::cerr << "\tConflict arguments: \"--regular\" and \"--limited\" are specified at the same time\n";
     }
@@ -117,6 +121,9 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_missing_value_for_pity_ctrl_arg) {
       std::cerr << "\tMissing value for \"-p (or --pity)\"\n";
     }
+    if (error_flag.err_missing_value_for_rate_up_num_ctrl_arg) {
+      std::cerr << "\tMissing value for \"-n (or --num-rate-up)\"\n";
+    }
     // Invalid value
     if (error_flag.err_invalid_value_for_total_pull_time_ctrl_arg) {
       std::cerr << "\tInvalid value for \"-t (or --total-pull-time)\" - it must be a positive integer\n";
@@ -124,6 +131,10 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_invalid_value_for_pity_ctrl_arg) {
       std::cerr << "\tInvalid value for \"-p (or --pity)\" - it must be a non-negative integer\n";
     }
+    if (error_flag.err_invalid_value_for_rate_up_num_ctrl_arg) {
+      std::cerr << "\tInvalid value for \"-n (or --num-rate-up)\" - it must be a 1 or 2\n";
+    }
+    // Unexpected value
     if (error_flag.err_unexpected_value_for_ctrl_arg_regular) {
       std::cerr << "\tUnexpected value for \"--regular\"\n";
     }
@@ -144,7 +155,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
     unsigned int& total_pull_time, unsigned int& pity_starting_point) {
-  const int expected_max_arg_num = 6;
+  const int expected_max_arg_num = 8;
   if (argc > expected_max_arg_num) {
     std::cerr << "Too many arguments!" << std::endl;
     display_help_message();
@@ -159,7 +170,7 @@ bool process_cmd_input_and_set_corres_var(
   // program, i.e., display help message, simulate a regular banner or 
   // a limited banner, etc.
   std::unordered_set<std::string> expected_control_arg( {"--help", "-t", "--total-pull-time",
-                                                         "--limited", "--regular", "-p", "--pity"} );
+                                                         "--limited", "--regular", "-p", "--pity", "-n", "--num-rate-up"} );
 
   // Store control argument in expected_control_arg as key and the non-control
   // argument follows it as elements in value, which is a vector of string.
@@ -191,7 +202,7 @@ bool process_cmd_input_and_set_corres_var(
         //break;
       }
     }
-    else if (argv[i][0] == '-') {
+    else if (argv[i][0] == '-') {  // TODO: fix bug here in next version
       error_flag.err_invalid_ctrl_args = true;
       error_flag.invalid_ctrl_args_list.push_back(argv[i]);
     }
@@ -227,6 +238,10 @@ bool process_cmd_input_and_set_corres_var(
       arg_map.find("--pity") != arg_map.end()) {
     error_flag.err_redundant_pity_ctrl_arg = true;
   }
+  if (arg_map.find("-n") != arg_map.end() &&
+      arg_map.find("--num-rate-up") != arg_map.end()) {
+    error_flag.err_redundant_rate_up_num_ctrl_arg = true;
+  }
 
   // Check whether conflict control arguments are provided,
   // i.e., --regular and --limited are both provided
@@ -245,6 +260,10 @@ bool process_cmd_input_and_set_corres_var(
   if (it_pity != arg_map.cend() && it_pity->second.size() == 0) {
     error_flag.err_missing_value_for_pity_ctrl_arg = true;
   }
+  const auto it_num = arg_map.count("-n") == 1 ? arg_map.find("-n") : arg_map.find("--num-rate-up");
+  if (it_num != arg_map.cend() && it_num->second.size() == 0) {
+    error_flag.err_missing_value_for_rate_up_num_ctrl_arg = true;
+  }
 
   // Check the format of specific value for control arguments that need one,
   // i.e., -t/--total-pull-time, -p/--pity
@@ -258,6 +277,7 @@ bool process_cmd_input_and_set_corres_var(
       char* p_end = nullptr;
       total_pull_time_temp = strtol(it_total_pull_time->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || total_pull_time_temp <= 0) {
+        std::cout << "--" << total_pull_time_temp << std::endl;
         error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
       }
     }
@@ -271,6 +291,23 @@ bool process_cmd_input_and_set_corres_var(
       pity_starting_temp = strtol(it_pity->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || pity_starting_temp < 0) {
         error_flag.err_invalid_value_for_pity_ctrl_arg = true;
+      }
+    }
+  }
+  long int num_rate_up_temp = -1;
+  if (it_num != arg_map.cend()) {
+    if (it_num->second.size() > 1) {
+              // std::cout << "reason 1" << std::endl;
+      error_flag.err_invalid_value_for_rate_up_num_ctrl_arg = true;
+    } else if (it_num->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+      char* p_end = nullptr;
+      num_rate_up_temp = strtol(it_num->second[0].c_str(), &p_end, 10);
+      // Currently the valid values for num_rate_up_temp (hence for num_rate_up)
+      // are 1 and 2
+      if (*p_end != '\0' || (num_rate_up_temp != 1 && num_rate_up_temp != 2)) {
+        // std::cout << "reason 2" << std::endl;
+        // std::cout << num_rate_up_temp << std::endl;
+        error_flag.err_invalid_value_for_rate_up_num_ctrl_arg = true;
       }
     }
   }
@@ -304,6 +341,11 @@ bool process_cmd_input_and_set_corres_var(
       // Should only has one element
       assert(it_pity->second.size() == 1);
       pity_starting_point = pity_starting_temp;
+    }
+    if (it_num != arg_map.cend()) {
+      // Should only has one element
+      assert(it_num->second.size() == 1);
+      probability_wrapper.set_banner_operator_num(num_rate_up_temp);
     }
   }
 

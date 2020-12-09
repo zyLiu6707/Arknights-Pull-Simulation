@@ -17,6 +17,10 @@ class ErrorFlag {
   bool err_invalid_value_for_pity_ctrl_arg;
   bool err_missing_value_for_pity_ctrl_arg;
 
+  bool err_redundant_rate_up_num_ctrl_arg;
+  bool err_invalid_value_for_rate_up_num_ctrl_arg;
+  bool err_missing_value_for_rate_up_num_ctrl_arg;
+
   bool err_conflict_ctrl_arg_flag;
   bool err_unexpected_value_for_ctrl_arg_limited;
   bool err_unexpected_value_for_ctrl_arg_regular;
@@ -34,6 +38,9 @@ class ErrorFlag {
         err_redundant_pity_ctrl_arg(false),
         err_invalid_value_for_pity_ctrl_arg(false),
         err_missing_value_for_pity_ctrl_arg(false),
+        err_redundant_rate_up_num_ctrl_arg(false),
+        err_invalid_value_for_rate_up_num_ctrl_arg(false),
+        err_missing_value_for_rate_up_num_ctrl_arg(false),
         err_conflict_ctrl_arg_flag(false),
         err_unexpected_value_for_ctrl_arg_limited(false),
         err_unexpected_value_for_ctrl_arg_regular(false),
@@ -44,13 +51,16 @@ class ErrorFlag {
   // Return true if any kinds of error occurs
   bool check_err() const {
     return err_redundant_identical_ctrl_arg ||
-           err_redundant_identical_ctrl_arg ||
            err_redundant_total_pull_time_ctrl_arg ||
-           err_redundant_pity_ctrl_arg || err_conflict_ctrl_arg_flag ||
            err_invalid_value_for_total_pull_time_ctrl_arg ||
            err_missing_value_for_total_pull_time_ctrl_arg ||
+           err_redundant_pity_ctrl_arg ||
            err_invalid_value_for_pity_ctrl_arg ||
            err_missing_value_for_pity_ctrl_arg ||
+           err_redundant_rate_up_num_ctrl_arg ||
+           err_invalid_value_for_rate_up_num_ctrl_arg ||
+           err_missing_value_for_rate_up_num_ctrl_arg ||
+           err_conflict_ctrl_arg_flag ||
            err_unexpected_value_for_ctrl_arg_limited ||
            err_unexpected_value_for_ctrl_arg_regular ||
            err_unexpected_arguments_at_the_beginning ||
