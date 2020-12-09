@@ -194,7 +194,7 @@ bool process_cmd_input_and_set_corres_var(
         //break;
       }
     }
-    else {
+    else if (argv[i][0] == '-') {
       error_flag.err_invalid_ctrl_args = true;
       error_flag.invalid_ctrl_args_list.push_back(argv[i]);
     }
