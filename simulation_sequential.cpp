@@ -1,7 +1,6 @@
 #include "utils.h"
 
 int main(int argc, char* argv[]) {
-  // TODO: adjust this logic to corperate with cmd line arg rules
   // On default, will calculate the probability of a limited banner (e.g.,
   // Nian, W and Rosmontis banner), which uses the following parameter: 
   // 1. Pr(get a star6 operator): 2% 
@@ -9,18 +8,18 @@ int main(int argc, char* argv[]) {
   // 3. Double rate up
   ProbabilityWrapper probability_wrapper(0.02, 0.7, 0.02, 2);
 
-  // On default, the pity system will comes into effect on the 51th pull
+  // In arknights, the pity system will comes into effect on the 51th pull
   // if you did not get any star6 operator in the past 50 pulls
   unsigned int pity_starting_point = 50;
-  // On default, run one billion times
-  // TODO: when finish single-thread version, restore the change here
-  // unsigned int total_pull_time = 1000000000;
-  unsigned int total_pull_time = 20000000;
 
-  // TODO: accept command line args as rate value
+  unsigned int total_pull_time = 0;
+
+  // TODO: accept command line args as rate value - might not be implemented
   bool can_continue = process_cmd_input_and_set_corres_var(
       argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
   if (!can_continue) {
+    // Exit the program here rather than exiting when argument format error is
+    // found to avoid memory leak
     return 0;
   }
 

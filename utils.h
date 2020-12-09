@@ -289,7 +289,7 @@ bool process_cmd_input_and_set_corres_var(
 
   display_error_detail(error_flag);
 
-  // Command line input is valid, now set the ProbabilityWrapper
+  // Command line input is valid, now set the fields ProbabilityWrapper
   if (!error_flag.check_err()) {
     if (arg_map.find("--regular") != arg_map.end()) {
       probability_wrapper.set_on_banner_star6_conditional_rate(
@@ -300,15 +300,11 @@ bool process_cmd_input_and_set_corres_var(
     }
     if (it_total_pull_time != arg_map.cend()) {
       // Should ony has one element
-      // DEBUG
-      // std::cout << "-t vector size = " << it_total_pull_time->second.size() << std::endl;
       assert(it_total_pull_time->second.size() == 1);
       total_pull_time = total_pull_time_temp;
     }
     if (it_pity != arg_map.cend()) {
       // Should only has one element
-      // DEBUG
-      // std::cout << "-p vector size = " << it_pity->second.size() << std::endl;
       assert(it_pity->second.size() == 1);
       pity_starting_point = pity_starting_temp;
     }
