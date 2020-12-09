@@ -22,6 +22,9 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+  display_simulation_settings(probability_wrapper, total_pull_time,
+                              pity_starting_point);
+
   // TODO: make it can accept command line arguments, and give prompt of possibly long time consumption!
   unsigned int seed = get_random_seed();
   std::mt19937_64 mt(seed);
@@ -70,7 +73,10 @@ int main(int argc, char* argv[]) {
   // to reach this limit.
   const size_t max_rare_event_map_size = 100000;
 
-  struct timespec start, end;
+  std::cout << "Now will start the simulation...\n" << std::endl;
+
+  struct timespec start;
+  struct timespec end;
 
   clock_gettime(CLOCK_MONOTONIC, &start);
 

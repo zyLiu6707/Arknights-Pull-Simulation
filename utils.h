@@ -310,6 +310,27 @@ bool process_cmd_input_and_set_corres_var(
   return !error_flag.check_err();
 }
 
+// Display the simulation settings before starting the simulation
+void display_simulation_settings(const ProbabilityWrapper& probability_wrapper,
+                                 const unsigned int total_pull_time,
+                                 const unsigned int pity_starting_point) {
+  std::cout << "The simulation settings are:\n";
+  std::cout << "\tTotal Pulling Times: " << total_pull_time << "\n";
+  std::cout << "\tPity System Starting Point: " << pity_starting_point << "\n";
+  if (probability_wrapper.get_on_banner_star6_conditional_rate() ==
+      limited_banner_on_banner_star6_conditional_rate) {
+    std::cout << "\tBanner Type: Limited Banner, the conditional rate is "
+              << limited_banner_on_banner_star6_conditional_rate * 100 << " %\n";
+  } else if (probability_wrapper.get_on_banner_star6_conditional_rate() ==
+             regular_banner_on_banner_star6_conditional_rate) {
+    std::cout << "\tBanner Type: Regular Banner, the conditional rate is "
+              << regular_banner_on_banner_star6_conditional_rate * 100 << " %\n";
+  }
+  std::cout << "\tRate-Up Operator(s): "
+            << probability_wrapper.get_banner_operator_num() << " operator(s)\n"
+            << std::endl;
+}
+
 // Display the simulation results
 void display_simulation_results(
     const std::vector<unsigned int>& result,
