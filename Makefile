@@ -9,7 +9,7 @@ TARGETS = simulation_sequential
 $(TARGETS): $(OBJS)
 	$(CXX) -o $@ $(OBJS)
 
-simulation_sequential.o: simulation_sequential.cpp probability_wrapper.h utils.h
+simulation_sequential.o: simulation_sequential.cpp utils.h error_flag.h
 	$(CXX) -c $< $(CFLAGS)
 
 probability_wrapper.o: probability_wrapper.cpp probability_wrapper.h
