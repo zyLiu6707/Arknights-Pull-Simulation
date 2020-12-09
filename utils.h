@@ -88,7 +88,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
       return;
     }
     if (error_flag.err_invalid_ctrl_args) {
-      std::cerr << "\tInvalid arguments: ";
+      std::cerr << "\tInvalid control arguments: ";
       for (const auto& invalid_arg : error_flag.invalid_ctrl_args_list) {
         std::cerr << invalid_arg << " ";
       }
