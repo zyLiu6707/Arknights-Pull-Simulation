@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
 
   unsigned int total_pull_time = 0;
 
-  // TODO: accept command line args as rate value - might not be implemented
   bool can_continue = process_cmd_input_and_set_corres_var(
       argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
   if (!can_continue) {
@@ -66,6 +65,11 @@ int main(int argc, char* argv[]) {
   // untill pulling more than 1000 times
   std::unordered_map<unsigned int, unsigned int> rare_event;
 
+  // To avoid the rare_event map recording too many items and consuming too 
+  // large memory. You need to simulate approximately 10^13 times of pulling
+  // to reach this limit.
+  const size_t max_rare_event_map_size = 100000;
+
   struct timespec start, end;
 
   clock_gettime(CLOCK_MONOTONIC, &start);
@@ -82,7 +86,7 @@ int main(int argc, char* argv[]) {
         target_star6_count++;
         if (current_pull_count < result.size()) {
           result[current_pull_count]++;
-        } else {
+        } else if (rare_event.size() < max_rare_event_map_size) {
           rare_event[current_pull_count]++;
         }
         current_pull_count = 0;

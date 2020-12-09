@@ -74,8 +74,6 @@ void display_help_message() {
                // TODO: add the -n|--on-banner-num arguments introduction!
                << std::endl;
 
-  // // TODO: Check memory leaks here!
-  // exit(EXIT_SUCCESS);
   return;
 }
 
@@ -138,11 +136,10 @@ void display_error_detail(const ErrorFlag& error_flag) {
   }
 }
 
-// TODO: finish this!
 // Read the command line inputs, check the potential errors.
 // If the input is valid, set the corresponding field in ProbabilityWrapper
 // and other variables.
-// Return a bool flag with true value if the input is valid, which will 
+// Return a bool flag with true value if the input is valid, which will
 // indicates the main simulation program whether can continue running
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
@@ -349,9 +346,7 @@ void display_simulation_results(
   if (rare_event.size() != 0) {
     std::cout << "The rare events are:" << std::endl;
   }
-  // TODO: less likely - print limited amount of rare events when this kind of
-  // events happens many times in total under **ENOUGH** times of pull
-  // simulation
+
   for (const auto& p : rare_event) {
     std::cout << "\tEvent \"Pulling " << p.first
               << " times to get the target star6 at the last pull\" happend "
@@ -375,8 +370,7 @@ void display_simulation_results(
 
   std::cout << "The estimated probabilities are (skip all non-happend events): "
             << std::endl;
-  for (unsigned int i = 1; i < result.size();
-       ++i) {  // skip the unused result[0]
+  for (unsigned int i = 1; i < result.size(); ++i) {  // skip the unused index 0
     if (result[i] != 0) {
       std::cout << "Pr(Pulling " << i << " times to succeed) = "
                 << (100.0 * result[i]) / target_star6_count << " %"
