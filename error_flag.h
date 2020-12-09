@@ -17,9 +17,9 @@ class ErrorFlag {
   bool err_invalid_value_for_pity_ctrl_arg;
   bool err_missing_value_for_pity_ctrl_arg;
 
-  bool err_redundant_rate_up_num_ctrl_arg;
-  bool err_invalid_value_for_rate_up_num_ctrl_arg;
-  bool err_missing_value_for_rate_up_num_ctrl_arg;
+  bool err_redundant_num_rate_up_ctrl_arg;
+  bool err_invalid_value_for_num_rate_up_ctrl_arg;
+  bool err_missing_value_for_num_rate_up_ctrl_arg;
 
   bool err_conflict_ctrl_arg_flag;
   bool err_unexpected_value_for_ctrl_arg_limited;
@@ -38,9 +38,9 @@ class ErrorFlag {
         err_redundant_pity_ctrl_arg(false),
         err_invalid_value_for_pity_ctrl_arg(false),
         err_missing_value_for_pity_ctrl_arg(false),
-        err_redundant_rate_up_num_ctrl_arg(false),
-        err_invalid_value_for_rate_up_num_ctrl_arg(false),
-        err_missing_value_for_rate_up_num_ctrl_arg(false),
+        err_redundant_num_rate_up_ctrl_arg(false),
+        err_invalid_value_for_num_rate_up_ctrl_arg(false),
+        err_missing_value_for_num_rate_up_ctrl_arg(false),
         err_conflict_ctrl_arg_flag(false),
         err_unexpected_value_for_ctrl_arg_limited(false),
         err_unexpected_value_for_ctrl_arg_regular(false),
@@ -57,9 +57,9 @@ class ErrorFlag {
            err_redundant_pity_ctrl_arg ||
            err_invalid_value_for_pity_ctrl_arg ||
            err_missing_value_for_pity_ctrl_arg ||
-           err_redundant_rate_up_num_ctrl_arg ||
-           err_invalid_value_for_rate_up_num_ctrl_arg ||
-           err_missing_value_for_rate_up_num_ctrl_arg ||
+           err_redundant_num_rate_up_ctrl_arg ||
+           err_invalid_value_for_num_rate_up_ctrl_arg ||
+           err_missing_value_for_num_rate_up_ctrl_arg ||
            err_conflict_ctrl_arg_flag ||
            err_unexpected_value_for_ctrl_arg_limited ||
            err_unexpected_value_for_ctrl_arg_regular ||

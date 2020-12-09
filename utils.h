@@ -107,7 +107,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_redundant_pity_ctrl_arg) {
       std::cerr << "\tRedundant arguments: \"-p\" and \"--pity\" are specified at the same time\n";
     }
-    if (error_flag.err_redundant_rate_up_num_ctrl_arg) {
+    if (error_flag.err_redundant_num_rate_up_ctrl_arg) {
       std::cerr << "\tRedundant arguments: \"-n\" and \"--num-rate-up\" are specified at the same time\n";
     }
     // Conflict arguments
@@ -121,7 +121,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_missing_value_for_pity_ctrl_arg) {
       std::cerr << "\tMissing value for \"-p (or --pity)\"\n";
     }
-    if (error_flag.err_missing_value_for_rate_up_num_ctrl_arg) {
+    if (error_flag.err_missing_value_for_num_rate_up_ctrl_arg) {
       std::cerr << "\tMissing value for \"-n (or --num-rate-up)\"\n";
     }
     // Invalid value
@@ -131,7 +131,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_invalid_value_for_pity_ctrl_arg) {
       std::cerr << "\tInvalid value for \"-p (or --pity)\" - it must be a non-negative integer\n";
     }
-    if (error_flag.err_invalid_value_for_rate_up_num_ctrl_arg) {
+    if (error_flag.err_invalid_value_for_num_rate_up_ctrl_arg) {
       std::cerr << "\tInvalid value for \"-n (or --num-rate-up)\" - it must be a 1 or 2\n";
     }
     // Unexpected value
@@ -240,7 +240,7 @@ bool process_cmd_input_and_set_corres_var(
   }
   if (arg_map.find("-n") != arg_map.end() &&
       arg_map.find("--num-rate-up") != arg_map.end()) {
-    error_flag.err_redundant_rate_up_num_ctrl_arg = true;
+    error_flag.err_redundant_num_rate_up_ctrl_arg = true;
   }
 
   // Check whether conflict control arguments are provided,
@@ -262,7 +262,7 @@ bool process_cmd_input_and_set_corres_var(
   }
   const auto it_num = arg_map.count("-n") == 1 ? arg_map.find("-n") : arg_map.find("--num-rate-up");
   if (it_num != arg_map.cend() && it_num->second.size() == 0) {
-    error_flag.err_missing_value_for_rate_up_num_ctrl_arg = true;
+    error_flag.err_missing_value_for_num_rate_up_ctrl_arg = true;
   }
 
   // Check the format of specific value for control arguments that need one,
@@ -298,7 +298,7 @@ bool process_cmd_input_and_set_corres_var(
   if (it_num != arg_map.cend()) {
     if (it_num->second.size() > 1) {
               // std::cout << "reason 1" << std::endl;
-      error_flag.err_invalid_value_for_rate_up_num_ctrl_arg = true;
+      error_flag.err_invalid_value_for_num_rate_up_ctrl_arg = true;
     } else if (it_num->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
       num_rate_up_temp = strtol(it_num->second[0].c_str(), &p_end, 10);
@@ -307,7 +307,7 @@ bool process_cmd_input_and_set_corres_var(
       if (*p_end != '\0' || (num_rate_up_temp != 1 && num_rate_up_temp != 2)) {
         // std::cout << "reason 2" << std::endl;
         // std::cout << num_rate_up_temp << std::endl;
-        error_flag.err_invalid_value_for_rate_up_num_ctrl_arg = true;
+        error_flag.err_invalid_value_for_num_rate_up_ctrl_arg = true;
       }
     }
   }
