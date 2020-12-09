@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <time.h>
 
+#include <cctype>  // isdigit
 #include <iostream>
 #include <random>
 #include <unordered_map>
@@ -199,10 +200,13 @@ bool process_cmd_input_and_set_corres_var(
       else {
         // Situation that exact same control arg appears more than once
         error_flag.err_redundant_identical_ctrl_arg = true;
-        //break;
+        // break;
       }
-    }
-    else if (argv[i][0] == '-') {  // TODO: fix bug here in next version
+    } 
+    // Starts with a '-' and the second char (if exists) is not a number, 
+    // then we regards this is an (attempted) control arugments
+    // Note: isdigit will regard the '\0' in argv as a non-number character
+    else if (argv[i][0] == '-' && !isdigit(argv[i][1])) {
       error_flag.err_invalid_ctrl_args = true;
       error_flag.invalid_ctrl_args_list.push_back(argv[i]);
     }
