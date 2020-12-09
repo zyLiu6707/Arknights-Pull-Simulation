@@ -111,17 +111,17 @@ void display_error_detail(const ErrorFlag& error_flag) {
       std::cerr << "\tConflict arguments: \"--regular\" and \"--limited\" are specified at the same time\n";
     }
     // Missing detail value
-    if (error_flag.err_missing_value_for_ctrl_arg_total_pull_time) {
+    if (error_flag.err_missing_value_for_total_pull_time_ctrl_arg) {
       std::cerr << "\tMissing value for \"-t (or --total-pull-time)\"\n";
     }
-    if (error_flag.err_missing_value_for_ctrl_arg_pity) {
+    if (error_flag.err_missing_value_for_pity_ctrl_arg) {
       std::cerr << "\tMissing value for \"-p (or --pity)\"\n";
     }
     // Invalid value
-    if (error_flag.err_invalid_value_for_ctrl_arg_total_pull_time) {
+    if (error_flag.err_invalid_value_for_total_pull_time_ctrl_arg) {
       std::cerr << "\tInvalid value for \"-t (or --total-pull-time)\" - it must be a positive integer\n";
     }
-    if (error_flag.err_invalid_value_for_ctrl_arg_pity) {
+    if (error_flag.err_invalid_value_for_pity_ctrl_arg) {
       std::cerr << "\tInvalid value for \"-p (or --pity)\" - it must be a non-negative integer\n";
     }
     if (error_flag.err_unexpected_value_for_ctrl_arg_regular) {
@@ -239,11 +239,11 @@ bool process_cmd_input_and_set_corres_var(
   // i.e., -t/--total-pull-time, -p/--pity
   const auto it_total_pull_time = arg_map.count("-t") == 1 ? arg_map.find("-t") : arg_map.find("--total-pull-time");
   if (it_total_pull_time != arg_map.cend() && it_total_pull_time->second.size() == 0) {
-    error_flag.err_missing_value_for_ctrl_arg_total_pull_time = true;
+    error_flag.err_missing_value_for_total_pull_time_ctrl_arg = true;
   }
   const auto it_pity = arg_map.count("-p") == 1 ? arg_map.find("-p") : arg_map.find("--pity");
   if (it_pity != arg_map.cend() && it_pity->second.size() == 0) {
-    error_flag.err_missing_value_for_ctrl_arg_pity = true;
+    error_flag.err_missing_value_for_pity_ctrl_arg = true;
   }
 
   // Check the format of specific value for control arguments that need one,
@@ -253,24 +253,24 @@ bool process_cmd_input_and_set_corres_var(
   long int total_pull_time_temp = -1;
   if (it_total_pull_time != arg_map.cend()) {
     if (it_total_pull_time->second.size() > 1) {
-      error_flag.err_invalid_value_for_ctrl_arg_total_pull_time = true;
+      error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
     } else if (it_total_pull_time->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
       total_pull_time_temp = strtol(it_total_pull_time->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || total_pull_time_temp <= 0) {
-        error_flag.err_invalid_value_for_ctrl_arg_total_pull_time = true;
+        error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
       }
     }
   }
   long int pity_starting_temp = -1;
   if (it_pity != arg_map.cend()) {
     if (it_pity->second.size() > 1) {
-      error_flag.err_invalid_value_for_ctrl_arg_pity = true;
+      error_flag.err_invalid_value_for_pity_ctrl_arg = true;
     } else if (it_pity->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
       pity_starting_temp = strtol(it_pity->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || pity_starting_temp < 0) {
-        error_flag.err_invalid_value_for_ctrl_arg_pity = true;
+        error_flag.err_invalid_value_for_pity_ctrl_arg = true;
       }
     }
   }
