@@ -83,8 +83,9 @@ void display_error_detail(const ErrorFlag& error_flag) {
   if (error_flag.check_err()) {
     std::cerr << "The provided command line arguments are invalid due to the following error(s):\n";
     if (error_flag.err_help_ctrl_arg_with_other_args) {
-      std::cerr << "\tIf you would like to see help message, please ony specify \"--help\"\n";
-      std::cerr << "\tOther arguments are ignored. Will not run the simulation.\n";
+      std::cerr << "\tOther argument(s) is(are) found with \"--help\"\n";
+      std::cerr << "If you would like to see help message, please ony specify \"--help\"\n";
+      std::cerr << "Other arguments are ignored. Will not run the simulation.\n";
       // Ignore other args and potential errors, aborting the program
       return;
     }
@@ -117,23 +118,41 @@ void display_error_detail(const ErrorFlag& error_flag) {
     }
     // Missing detail value
     if (error_flag.err_missing_value_for_total_pull_time_ctrl_arg) {
-      std::cerr << "\tMissing value for \"-t (or --total-pull-time)\"\n";
+      std::cerr << "\tMissing value for \"-t\"\n";
+    }
+    if (error_flag.err_missing_value_for_total_pull_time_long_name_ctrl_arg) {
+      std::cerr << "\tMissing value for \"--total-pull-time\"\n";
     }
     if (error_flag.err_missing_value_for_pity_ctrl_arg) {
-      std::cerr << "\tMissing value for \"-p (or --pity)\"\n";
+      std::cerr << "\tMissing value for \"-p\"\n";
+    }
+    if (error_flag.err_missing_value_for_pity_long_name_ctrl_arg) {
+      std::cerr << "\tMissing value for \"--pity\"\n";
     }
     if (error_flag.err_missing_value_for_num_rate_up_ctrl_arg) {
-      std::cerr << "\tMissing value for \"-n (or --num-rate-up)\"\n";
+      std::cerr << "\tMissing value for \"-n\"\n";
+    }
+    if (error_flag.err_missing_value_for_num_rate_up_long_name_ctrl_arg) {
+      std::cerr << "\tMissing value for \"--num-rate-up\"\n";
     }
     // Invalid value
     if (error_flag.err_invalid_value_for_total_pull_time_ctrl_arg) {
-      std::cerr << "\tInvalid value for \"-t (or --total-pull-time)\" - it must be a positive integer\n";
+      std::cerr << "\tInvalid value for \"-t\" - it must be a positive integer\n";
+    }
+    if (error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg) {
+      std::cerr << "\tInvalid value for \"--total-pull-time\" - it must be a positive integer\n";
     }
     if (error_flag.err_invalid_value_for_pity_ctrl_arg) {
-      std::cerr << "\tInvalid value for \"-p (or --pity)\" - it must be a non-negative integer\n";
+      std::cerr << "\tInvalid value for \"-p\" - it must be a non-negative integer\n";
+    }
+    if (error_flag.err_invalid_value_for_pity_long_name_ctrl_arg) {
+      std::cerr << "\tInvalid value for \"--pity\" - it must be a non-negative integer\n";
     }
     if (error_flag.err_invalid_value_for_num_rate_up_ctrl_arg) {
-      std::cerr << "\tInvalid value for \"-n (or --num-rate-up)\" - it must be a 1 or 2\n";
+      std::cerr << "\tInvalid value for \"-n\" - it must be a 1 or 2\n";
+    }
+    if (error_flag.err_invalid_value_for_num_rate_up_long_name_ctrl_arg) {
+      std::cerr << "\tInvalid value for \"--num-rate-up\" - it must be a 1 or 2\n";
     }
     // Unexpected value
     if (error_flag.err_unexpected_value_for_ctrl_arg_regular) {
@@ -194,7 +213,10 @@ bool process_cmd_input_and_set_corres_var(
           if (expected_control_arg.find(argv[j]) != expected_control_arg.end()) {
             break;
           }
-          arg_map[argv[i]].push_back(argv[j]);
+          // TODO: write a comment here (AB + A' = A' + B)
+          else if (argv[j][0] != '-' || isdigit(argv[j][1])) {
+            arg_map[argv[i]].push_back(argv[j]);
+          }
         }
       } 
       else {
@@ -227,23 +249,32 @@ bool process_cmd_input_and_set_corres_var(
     }
   }
 
+
+  // Now check whether the command line arguments are invalid
   // Argument error priority order:
   // too many arg > redundant arg > conflict arg > missing value > invalid value
+  const auto iter_total_pull_time = arg_map.find("-t");
+  const auto iter_total_pull_time_long_name = arg_map.find("--total-pull-time");
+  const auto iter_pity = arg_map.find("-p");
+  const auto iter_pity_long_name = arg_map.find("--pity");
+  const auto iter_num_rate_up = arg_map.find("-n");
+  const auto iter_num_rate_up_long_name = arg_map.find("--num-rate-up");
+
   // Check whether the first argument (i.e., argv[1]) is invalid
   if (expected_control_arg.find(std::string(argv[1])) == expected_control_arg.end()) {
     error_flag.err_unexpected_arguments_at_the_beginning = true;
   }
   // Check another situation of redundant control arguments
-  if (arg_map.find("-t") != arg_map.end() &&
-      arg_map.find("--total-pull-time") != arg_map.end()) {
+  if (iter_total_pull_time != arg_map.end() &&
+      iter_total_pull_time_long_name != arg_map.end()) {
     error_flag.err_redundant_total_pull_time_ctrl_arg = true;
   }
-  if (arg_map.find("-p") != arg_map.end() &&
-      arg_map.find("--pity") != arg_map.end()) {
+  if (iter_pity != arg_map.end() &&
+      iter_pity_long_name != arg_map.end()) {
     error_flag.err_redundant_pity_ctrl_arg = true;
   }
-  if (arg_map.find("-n") != arg_map.end() &&
-      arg_map.find("--num-rate-up") != arg_map.end()) {
+  if (iter_num_rate_up != arg_map.end() &&
+      iter_num_rate_up_long_name != arg_map.end()) {
     error_flag.err_redundant_num_rate_up_ctrl_arg = true;
   }
 
@@ -256,17 +287,22 @@ bool process_cmd_input_and_set_corres_var(
 
   // Check whether missing a specific value for control arguments that need one,
   // i.e., -t/--total-pull-time, -p/--pity
-  const auto it_total_pull_time = arg_map.count("-t") == 1 ? arg_map.find("-t") : arg_map.find("--total-pull-time");
-  if (it_total_pull_time != arg_map.cend() && it_total_pull_time->second.size() == 0) {
+  if (iter_total_pull_time != arg_map.cend() && iter_total_pull_time->second.size() == 0) {
     error_flag.err_missing_value_for_total_pull_time_ctrl_arg = true;
+  } else if (iter_total_pull_time_long_name != arg_map.cend() && iter_total_pull_time_long_name->second.size() == 0) {
+    error_flag.err_missing_value_for_total_pull_time_long_name_ctrl_arg = true;
   }
-  const auto it_pity = arg_map.count("-p") == 1 ? arg_map.find("-p") : arg_map.find("--pity");
-  if (it_pity != arg_map.cend() && it_pity->second.size() == 0) {
+
+  if (iter_pity != arg_map.cend() && iter_pity->second.size() == 0) {
     error_flag.err_missing_value_for_pity_ctrl_arg = true;
+  } else if (iter_pity_long_name != arg_map.cend() && iter_pity_long_name->second.size() == 0) {
+    error_flag.err_missing_value_for_pity_long_name_ctrl_arg = true;
   }
-  const auto it_num = arg_map.count("-n") == 1 ? arg_map.find("-n") : arg_map.find("--num-rate-up");
-  if (it_num != arg_map.cend() && it_num->second.size() == 0) {
+  
+  if (iter_num_rate_up != arg_map.cend() && iter_num_rate_up->second.size() == 0) {
     error_flag.err_missing_value_for_num_rate_up_ctrl_arg = true;
+  } else if (iter_num_rate_up_long_name != arg_map.cend() && iter_num_rate_up_long_name->second.size() == 0) {
+    error_flag.err_missing_value_for_num_rate_up_long_name_ctrl_arg = true;
   }
 
   // Check the format of specific value for control arguments that need one,
@@ -274,44 +310,79 @@ bool process_cmd_input_and_set_corres_var(
   // the specific values are required to be positive integer; If the format is
   // correct, then retrieve the argument value
   long int total_pull_time_temp = -1;
-  if (it_total_pull_time != arg_map.cend()) {
-    if (it_total_pull_time->second.size() > 1) {
+  if (iter_total_pull_time != arg_map.cend()) {
+    if (iter_total_pull_time->second.size() > 1) {
       error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
-    } else if (it_total_pull_time->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+    }
+    // Must be a non-empty vector to be able call strtol
+    else if (iter_total_pull_time->second.size() > 0) {
       char* p_end = nullptr;
-      total_pull_time_temp = strtol(it_total_pull_time->second[0].c_str(), &p_end, 10);
+      total_pull_time_temp = strtol(iter_total_pull_time->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || total_pull_time_temp <= 0) {
-        std::cout << "--" << total_pull_time_temp << std::endl;
         error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
       }
     }
   }
-  long int pity_starting_temp = -1;
-  if (it_pity != arg_map.cend()) {
-    if (it_pity->second.size() > 1) {
-      error_flag.err_invalid_value_for_pity_ctrl_arg = true;
-    } else if (it_pity->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+  if (iter_total_pull_time_long_name != arg_map.cend()) {
+    if (iter_total_pull_time_long_name->second.size() > 1) {
+      error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg = true;
+    }
+    // Must be a non-empty vector to be able call strtol
+    else if (iter_total_pull_time_long_name->second.size() > 0) {
       char* p_end = nullptr;
-      pity_starting_temp = strtol(it_pity->second[0].c_str(), &p_end, 10);
+      total_pull_time_temp = strtol(iter_total_pull_time_long_name->second[0].c_str(), &p_end, 10);
+      if (*p_end != '\0' || total_pull_time_temp <= 0) {
+        error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg = true;
+      }
+    }
+  }
+  long int pity_starting_temp = -1;
+  if (iter_pity != arg_map.cend()) {
+    if (iter_pity->second.size() > 1) {
+      error_flag.err_invalid_value_for_pity_ctrl_arg = true;
+    } else if (iter_pity->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+      char* p_end = nullptr;
+      pity_starting_temp = strtol(iter_pity->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || pity_starting_temp < 0) {
         error_flag.err_invalid_value_for_pity_ctrl_arg = true;
       }
     }
   }
-  long int num_rate_up_temp = -1;
-  if (it_num != arg_map.cend()) {
-    if (it_num->second.size() > 1) {
-              // std::cout << "reason 1" << std::endl;
-      error_flag.err_invalid_value_for_num_rate_up_ctrl_arg = true;
-    } else if (it_num->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+  if (iter_pity_long_name != arg_map.cend()) {
+    if (iter_pity_long_name->second.size() > 1) {
+      error_flag.err_invalid_value_for_pity_long_name_ctrl_arg = true;
+    } else if (iter_pity_long_name->second.size() > 0) {  // must be a non-empty vector to be able call strtol
       char* p_end = nullptr;
-      num_rate_up_temp = strtol(it_num->second[0].c_str(), &p_end, 10);
+      pity_starting_temp = strtol(iter_pity_long_name->second[0].c_str(), &p_end, 10);
+      if (*p_end != '\0' || pity_starting_temp < 0) {
+        error_flag.err_invalid_value_for_pity_long_name_ctrl_arg = true;
+      }
+    }
+  }
+  long int num_rate_up_temp = -1;
+  if (iter_num_rate_up != arg_map.cend()) {
+    if (iter_num_rate_up->second.size() > 1) {
+      error_flag.err_invalid_value_for_num_rate_up_ctrl_arg = true;
+    } else if (iter_num_rate_up->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+      char* p_end = nullptr;
+      num_rate_up_temp = strtol(iter_num_rate_up->second[0].c_str(), &p_end, 10);
       // Currently the valid values for num_rate_up_temp (hence for num_rate_up)
       // are 1 and 2
       if (*p_end != '\0' || (num_rate_up_temp != 1 && num_rate_up_temp != 2)) {
-        // std::cout << "reason 2" << std::endl;
-        // std::cout << num_rate_up_temp << std::endl;
         error_flag.err_invalid_value_for_num_rate_up_ctrl_arg = true;
+      }
+    }
+  }
+  if (iter_num_rate_up_long_name != arg_map.cend()) {
+    if (iter_num_rate_up_long_name->second.size() > 1) {
+      error_flag.err_invalid_value_for_num_rate_up_long_name_ctrl_arg = true;
+    } else if (iter_num_rate_up_long_name->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+      char* p_end = nullptr;
+      num_rate_up_temp = strtol(iter_num_rate_up_long_name->second[0].c_str(), &p_end, 10);
+      // Currently the valid values for num_rate_up_temp (hence for num_rate_up)
+      // are 1 and 2
+      if (*p_end != '\0' || (num_rate_up_temp != 1 && num_rate_up_temp != 2)) {
+        error_flag.err_invalid_value_for_num_rate_up_long_name_ctrl_arg = true;
       }
     }
   }
@@ -336,19 +407,31 @@ bool process_cmd_input_and_set_corres_var(
       probability_wrapper.set_on_banner_star6_conditional_rate(
           limited_banner_on_banner_star6_conditional_rate);
     }
-    if (it_total_pull_time != arg_map.cend()) {
-      // Should ony has one element
-      assert(it_total_pull_time->second.size() == 1);
+    // Set the value of -t|--total-pull-time
+    if (iter_total_pull_time != arg_map.cend() ) {
+      assert(iter_total_pull_time->second.size() == 1);
       total_pull_time = total_pull_time_temp;
     }
-    if (it_pity != arg_map.cend()) {
-      // Should only has one element
-      assert(it_pity->second.size() == 1);
+    if (iter_total_pull_time_long_name != arg_map.cend() ) {
+      assert(iter_total_pull_time_long_name->second.size() == 1);
+      total_pull_time = total_pull_time_temp;
+    }
+    // Set the value of -p|--pity
+    if (iter_pity != arg_map.cend()) {
+      assert(iter_pity->second.size() == 1);
       pity_starting_point = pity_starting_temp;
     }
-    if (it_num != arg_map.cend()) {
-      // Should only has one element
-      assert(it_num->second.size() == 1);
+    if (iter_pity_long_name != arg_map.cend()) {
+      assert(iter_pity_long_name->second.size() == 1);
+      pity_starting_point = pity_starting_temp;
+    }
+    // Set the value of -n|--num-rate-up
+    if (iter_num_rate_up != arg_map.cend()) {
+      assert(iter_num_rate_up->second.size() == 1);
+      probability_wrapper.set_banner_operator_num(num_rate_up_temp);
+    }
+    if (iter_num_rate_up_long_name != arg_map.cend()) {
+      assert(iter_num_rate_up_long_name->second.size() == 1);
       probability_wrapper.set_banner_operator_num(num_rate_up_temp);
     }
   }
