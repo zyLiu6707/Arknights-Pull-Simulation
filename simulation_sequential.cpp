@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
   // if you did not get any star6 operator in the past 50 pulls
   unsigned int pity_starting_point = 50;
 
-  unsigned long int total_pull_time = 0;
+  unsigned long int total_pull_time = 100000000;
 
   bool can_continue = process_cmd_input_and_set_corres_var(
       argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
