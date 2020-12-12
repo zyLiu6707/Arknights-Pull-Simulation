@@ -4,7 +4,7 @@ int main(int argc, char* argv[]) {
   std::cout << "\n*************** Start Testing ***************\n";
 
   ProbabilityWrapper dbg_pw(-1.0, -1.0, -1.0, 1);
-  unsigned long int dbg_total_pull_time = 0;
+  unsigned long long int dbg_total_pull_time = 0;
   unsigned int dbg_pity_starting_point = 0;
   std::cout << "argc = " << argc << std::endl;
   std::cout << "Initially:\n"

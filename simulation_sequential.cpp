@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
   // if you did not get any star6 operator in the past 50 pulls
   unsigned int pity_starting_point = 50;
 
-  unsigned long int total_pull_time = 100000000;
+  unsigned long long int total_pull_time = 100000000;
 
   bool can_continue = process_cmd_input_and_set_corres_var(
       argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
   clock_gettime(CLOCK_MONOTONIC, &start);
 
   // Start simulation
-  for (unsigned long int i = 0; i < total_pull_time; ++i) {
+  for (unsigned long long int i = 0; i < total_pull_time; ++i) {
     unsigned int rand_num = dist(mt);
     current_pull_count++;  // Leave the index 0 of result vector unused
     // Get a star-6 operator

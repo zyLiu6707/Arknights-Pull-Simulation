@@ -69,8 +69,10 @@ void display_help_message() {
   std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n"
                "--help : Display the help message\n"
                "--t|--total-pull-time : Set the time of pulling in a simulation\n"
-               "                        Valid value is an integer between [1, 18446744073709551615] on Linux/C++17\n"
-               "                        Note : this is not the experiment time\n"
+               "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux/C++17\n"
+               "                        Note : This is not the experiment time\n"
+               "                        Note : If you provide a number greather than 18446744073709551615, the\n"
+               "                               program will run the simulation with maximum valid times (i.e., 18446744073709551615)\n"
                "            --regular : Simulation and get the estimated probability in a regular banner\n"
                "                        Cannot be specified with --limited at the same time\n"
                "            --limited : Simulation and get the estimated probability in a limited banner\n"
@@ -180,7 +182,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
 // indicates the main simulation program whether can continue running
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
-    unsigned long int& total_pull_time, unsigned int& pity_starting_point) {
+    unsigned long long int& total_pull_time, unsigned int& pity_starting_point) {
   const int expected_max_arg_num = 8;
   if (argc > expected_max_arg_num) {
     std::cerr << "Too many arguments!" << std::endl;
@@ -219,7 +221,9 @@ bool process_cmd_input_and_set_corres_var(
           if (expected_control_arg.find(argv[j]) != expected_control_arg.end()) {
             break;
           }
-          // TODO: write a comment here (AB + A' = A' + B)
+          // Not a (attempt) control arg:
+          // 1. not starts with '-', OR
+          // 2. ...if starts with a '-', then the second char must be a number
           else if (argv[j][0] != '-' || isdigit(argv[j][1])) {
             arg_map[argv[i]].push_back(argv[j]);
           }
@@ -315,7 +319,10 @@ bool process_cmd_input_and_set_corres_var(
   // i.e., -t/--total-pull-time, -p/--pity
   // the specific values are required to be positive integer; If the format is
   // correct, then retrieve the argument value
-  long int total_pull_time_temp = -1;
+  // To receive the final value if valid, up to 2^64 - 1
+  unsigned long long int total_pull_time_temp = 0;
+  // To check whether provided a negative value
+  long long int total_pull_time_temp_compare = 0;
   if (iter_total_pull_time != arg_map.cend()) {
     if (iter_total_pull_time->second.size() > 1) {
       error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
@@ -323,8 +330,14 @@ bool process_cmd_input_and_set_corres_var(
     // Must be a non-empty vector to be able call strtol
     else if (iter_total_pull_time->second.size() > 0) {
       char* p_end = nullptr;
-      total_pull_time_temp = strtol(iter_total_pull_time->second[0].c_str(), &p_end, 10);
-      if (*p_end != '\0' || total_pull_time_temp <= 0) {
+      char* p_end_compare = nullptr;
+      total_pull_time_temp =
+          strtoull(iter_total_pull_time->second[0].c_str(), &p_end, 10);
+      total_pull_time_temp_compare =
+          strtoll(iter_total_pull_time->second[0].c_str(), &p_end_compare, 10);
+      if (*p_end != '\0' || *p_end_compare != '\0' ||  // not a number
+          total_pull_time_temp_compare <= 0            // non positive value
+      ) {
         error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
       }
     }
@@ -336,12 +349,19 @@ bool process_cmd_input_and_set_corres_var(
     // Must be a non-empty vector to be able call strtol
     else if (iter_total_pull_time_long_name->second.size() > 0) {
       char* p_end = nullptr;
-      total_pull_time_temp = strtol(iter_total_pull_time_long_name->second[0].c_str(), &p_end, 10);
-      if (*p_end != '\0' || total_pull_time_temp <= 0) {
-        error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg = true;
+      char* p_end_compare = nullptr;
+      total_pull_time_temp =
+          strtoull(iter_total_pull_time_long_name->second[0].c_str(), &p_end, 10);
+      total_pull_time_temp_compare =
+          strtoll(iter_total_pull_time_long_name->second[0].c_str(), &p_end_compare, 10);
+      if (*p_end != '\0' || *p_end_compare != '\0' ||  // not a number
+          total_pull_time_temp_compare <= 0            // non positive value
+      ) {
+        error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
       }
     }
   }
+
   long int pity_starting_temp = -1;
   if (iter_pity != arg_map.cend()) {
     if (iter_pity->second.size() > 1) {
@@ -365,6 +385,7 @@ bool process_cmd_input_and_set_corres_var(
       }
     }
   }
+  
   long int num_rate_up_temp = -1;
   if (iter_num_rate_up != arg_map.cend()) {
     if (iter_num_rate_up->second.size() > 1) {
@@ -447,7 +468,7 @@ bool process_cmd_input_and_set_corres_var(
 
 // Display the simulation settings before starting the simulation
 void display_simulation_settings(const ProbabilityWrapper& probability_wrapper,
-                                 const unsigned long int total_pull_time,
+                                 const unsigned long long int total_pull_time,
                                  const unsigned int pity_starting_point) {
   std::cout << "The simulation settings are:\n";
   std::cout << "\tTotal Pulling Times: " << total_pull_time << "\n";
