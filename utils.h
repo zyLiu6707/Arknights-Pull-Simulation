@@ -449,11 +449,13 @@ void display_simulation_settings(const ProbabilityWrapper& probability_wrapper,
   if (probability_wrapper.get_on_banner_star6_conditional_rate() ==
       limited_banner_on_banner_star6_conditional_rate) {
     std::cout << "\tBanner Type: Limited Banner, the conditional rate is "
-              << limited_banner_on_banner_star6_conditional_rate * 100 << " %\n";
+              << limited_banner_on_banner_star6_conditional_rate * 100
+              << " %\n";
   } else if (probability_wrapper.get_on_banner_star6_conditional_rate() ==
              regular_banner_on_banner_star6_conditional_rate) {
     std::cout << "\tBanner Type: Regular Banner, the conditional rate is "
-              << regular_banner_on_banner_star6_conditional_rate * 100 << " %\n";
+              << regular_banner_on_banner_star6_conditional_rate * 100
+              << " %\n";
   }
   std::cout << "\tRate-Up Operator(s): "
             << probability_wrapper.get_banner_operator_num() << " operator(s)\n"
