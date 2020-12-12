@@ -19,7 +19,7 @@ const double regular_banner_on_banner_star6_conditional_rate = 0.5;
 
 // Pre-defined parameters for displaying the results
 const size_t raw_data_showing_limit = 100;  // display up to this much raw data
-const size_t rare_event_showing_limit = 50;  // display up to this much rare events
+const size_t rare_event_showing_limit = 10;  // display up to this much rare events
 
 /* For debugging purpose */
 // Print the content in arg_map
