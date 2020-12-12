@@ -17,6 +17,10 @@
 const double limited_banner_on_banner_star6_conditional_rate = 0.7;
 const double regular_banner_on_banner_star6_conditional_rate = 0.5;
 
+// Pre-defined parameters for displaying the results
+const size_t raw_data_showing_limit = 100;  // display up to this much raw data
+const size_t rare_event_showing_limit = 50;  // display up to this much rare events
+
 /* For debugging purpose */
 // Print the content in arg_map
 #ifdef DEBUG
@@ -469,6 +473,8 @@ void display_simulation_results(
     unsigned int star6_count, unsigned int target_star6_count,
     unsigned int seed, const struct timespec& start,
     const struct timespec& end) {
+
+  // Simulation summary
   std::cout << "Time spent: " << calc_time(start, end) << "s" << std::endl;
   std::cout << "Random seed for this simulation: " << seed << std::endl;
   std::cout << "Star 6 times: " << star6_count << std::endl;
@@ -476,13 +482,14 @@ void display_simulation_results(
 
   std::cout << "-------------------------" << std::endl;
 
-  std::cout << "First 100 raw data:" << std::endl;
+  // Displaying raw data
+  std::cout << "First " << raw_data_showing_limit << " raw data:" << std::endl;
   std::cout << "\t";
-  for (int i = 0; i < 10; ++i) {
+  for (unsigned int i = 0; i < 10; ++i) {
     std::cout << i + 1 << ":\t";
   }
   std::cout << std::endl;
-  for (unsigned int i = 0; i < 100; ++i) {
+  for (size_t i = 0; i < raw_data_showing_limit; ++i) {
     if (i % 10 == 0) {
       std::cout << i / 10 + 1 << ":\t";
     }
@@ -492,21 +499,30 @@ void display_simulation_results(
     }
   }
   std::cout << std::endl;
+  if (raw_data_showing_limit % 10 != 0) {
+    std::cout << std::endl;
+  }
 
+  // Displaying rare events
   std::cout << "Rare events happend " << rare_event.size() << " times in total"
             << std::endl;
-  if (rare_event.size() != 0) {
-    std::cout << "The rare events are:" << std::endl;
+  if (rare_event.size() != 0 && rare_event_showing_limit > 0) {
+    std::cout << "Some rare events are (only showing "
+              << rare_event_showing_limit << " of them here):" << std::endl;
+
+    size_t counter = 0;
+    for (const auto& p : rare_event) {
+      if (counter < rare_event_showing_limit) {
+        std::cout
+            << "\tEvent \"Pulling " << p.first
+            << " times to get the target star6 at the last pull\" happend "
+            << p.second << " times" << std::endl;
+        counter++;
+      }
+    }
   }
 
-  for (const auto& p : rare_event) {
-    std::cout << "\tEvent \"Pulling " << p.first
-              << " times to get the target star6 at the last pull\" happend "
-              << p.second << " times" << std::endl;
-  }
   std::cout << std::endl;
-  // TODO: make it controlled by the command line argument and give the warning
-  // if user wish to still show the estimated probability
   std::cout << "Note: Since the rare events are very sensitive to the error of "
                "the actual distribution\n"
                "      of generated random numbers (i.e., we want a perfect "
@@ -520,6 +536,7 @@ void display_simulation_results(
 
   std::cout << "-------------------------" << std::endl;
 
+  // Displaying the estimated probability
   std::cout << "The estimated probabilities are (skip all non-happend events): "
             << std::endl;
   for (unsigned int i = 1; i < result.size(); ++i) {  // skip the unused index 0
