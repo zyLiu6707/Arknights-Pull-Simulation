@@ -174,7 +174,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
 // indicates the main simulation program whether can continue running
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
-    unsigned int& total_pull_time, unsigned int& pity_starting_point) {
+    unsigned long int& total_pull_time, unsigned int& pity_starting_point) {
   const int expected_max_arg_num = 8;
   if (argc > expected_max_arg_num) {
     std::cerr << "Too many arguments!" << std::endl;
@@ -441,7 +441,7 @@ bool process_cmd_input_and_set_corres_var(
 
 // Display the simulation settings before starting the simulation
 void display_simulation_settings(const ProbabilityWrapper& probability_wrapper,
-                                 const unsigned int total_pull_time,
+                                 const unsigned long int total_pull_time,
                                  const unsigned int pity_starting_point) {
   std::cout << "The simulation settings are:\n";
   std::cout << "\tTotal Pulling Times: " << total_pull_time << "\n";
