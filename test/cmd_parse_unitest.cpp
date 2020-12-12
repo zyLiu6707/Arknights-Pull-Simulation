@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
                "\ton banner operator num   = 1"
             << std::endl;
 
-  std::cout << "\n----- Starting Processing the Arguments -----";
+  std::cout << "\n----- Starting Processing the Arguments -----\n";
 
   bool dbg_can_continue = process_cmd_input_and_set_corres_var(argc, argv, dbg_pw, dbg_total_pull_time,
                                        dbg_pity_starting_point);

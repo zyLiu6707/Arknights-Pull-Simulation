@@ -66,7 +66,7 @@ auto get_random_seed() {
 
 // Display the help message
 void display_help_message() {
-  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n"
+  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
                "--help : Display the help message\n"
                "--t|--total-pull-time : Set the time of pulling in a simulation\n"
                "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux/C++17\n"
@@ -80,8 +80,10 @@ void display_help_message() {
                "               --pity : Set the starting point where the pity system comes into effect,\n"
                "                        i.e., you will get a higher probability on the specified pull's next pull\n"
                "                        Valid value is an integer between [1, 4294967295] on Linux/C++17\n"
+               "                        Note: If you provide a number greater than 4294967295, the program will run the\n"
+               "                              simulation with maximum valid value for pity starting time (i.e., 4294967295)\n"
                "     -n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"
-               "                        The valid values are 1 and 2\n"
+               "                        The valid values are 1 and 2"
                << std::endl;
 
   return;
