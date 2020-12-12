@@ -25,8 +25,7 @@ int main(int argc, char* argv[]) {
   display_simulation_settings(probability_wrapper, total_pull_time,
                               pity_starting_point);
 
-  // TODO: make it can accept command line arguments, and give prompt of possibly long time consumption!
-  unsigned int seed = get_random_seed();
+  auto seed = get_random_seed();
   std::mt19937_64 mt(seed);
   unsigned int dist_left_border = 0;
   unsigned int dist_right_border = 999;
@@ -35,13 +34,14 @@ int main(int argc, char* argv[]) {
                                                    dist_right_border);
 
   // Count the times of getting a star 6 operator in total_pull_times pulling
-  unsigned int star6_count = 0;
+  unsigned long long int star6_count = 0;
   // Count the times of getting the target star 6 operator in total_pull_times pulling
-  unsigned int target_star6_count = 0;
+  unsigned long long int target_star6_count = 0;
   // Count the times of countinuously getting a non-star-6 operator
   unsigned int pity_count = 0;
   // Count the times of pulling. Will be reset to 0 when get the target star 6 operator
-  unsigned int current_pull_count = 0;
+  // TODO: use uint_fast64_t?
+  unsigned long long int current_pull_count = 0;
 
   // The thresholds will be used to decide whether we got a star6/target star6
   // operator in a pull
@@ -62,11 +62,11 @@ int main(int argc, char* argv[]) {
   // and get the target star 6 operator at the last time pull (prepare enough money, haha),
   // then you can increase this number, but this will suffer more from the errors of
   // generated random numbers
-  std::vector<unsigned int> result(1000);
+  std::vector<unsigned long long int> result(1000);
 
   // Record the event that did not get a star 6 operator
   // untill pulling more than 1000 times
-  std::unordered_map<unsigned int, unsigned int> rare_event;
+  std::unordered_map<unsigned long long int, unsigned long long int> rare_event;
 
   // To avoid the rare_event map recording too many items and consuming too 
   // large memory. You need to simulate approximately 10^13 times of pulling
