@@ -36,3 +36,6 @@ simulation_sequential
 
 # Unitest executable files
 test/cmd_parse_unitest
+
+# Simulation results (not track for now)
+*.res
