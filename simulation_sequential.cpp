@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
   // In arknights, the pity system will comes into effect on the 51th pull
   // if you did not get any star6 operator in the past 50 pulls
-  unsigned int pity_starting_point = 50;
+  unsigned int pity_starting_point = 50;  // BUG: overflow!
 
   unsigned long long int total_pull_time = 100000000;
 
@@ -101,8 +101,9 @@ int main(int argc, char* argv[]) {
       star6_threshold = init_star6_threshold;
       target_star6_threshold = init_target_star6_threshold;
     } else {
-      pity_count++;
+      pity_count++;  // BUG: might (though almost not possible) overflow!
       if (pity_count > pity_starting_point) {
+        // BUG: these thresholds might (though almost not possible) overflow!
         star6_threshold += delta_star6_threshold;
         target_star6_threshold += delta_target_star6_threshold;
       }
@@ -110,10 +111,18 @@ int main(int argc, char* argv[]) {
   }
 
   clock_gettime(CLOCK_MONOTONIC, &end);
-  
+
+  struct timespec print_start;
+  struct timespec print_end;
+
+  clock_gettime(CLOCK_MONOTONIC, &print_start);
   // Print the result
   display_simulation_results(result, rare_event, star6_count,
                              target_star6_count, seed, start, end);
+
+  clock_gettime(CLOCK_MONOTONIC, &print_end);
+
+  std::cout << "Results printing time spent: " << calc_time(print_start, print_end) << "s" << std::endl;
 
   return 0;
 }

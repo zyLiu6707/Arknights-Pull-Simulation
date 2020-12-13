@@ -553,7 +553,7 @@ void display_simulation_results(
                "      of generated random numbers (i.e., we want a perfect "
                "uniform distribution, but\n"
                "      there would be error under limited times of random "
-               "number generation), the\n"
+               "number generating), the\n"
                "      estimated probabilities for these rare events will not "
                "be accurate.\n"
                "      Hence will not show the estimated probabilities of those rare events."
