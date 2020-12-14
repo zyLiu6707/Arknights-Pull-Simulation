@@ -112,17 +112,9 @@ int main(int argc, char* argv[]) {
 
   clock_gettime(CLOCK_MONOTONIC, &end);
 
-  struct timespec print_start;
-  struct timespec print_end;
-
-  clock_gettime(CLOCK_MONOTONIC, &print_start);
   // Print the result
   display_simulation_results(result, rare_event, star6_count,
                              target_star6_count, seed, start, end);
-
-  clock_gettime(CLOCK_MONOTONIC, &print_end);
-
-  std::cout << "Results printing time spent: " << calc_time(print_start, print_end) << "s" << std::endl;
 
   return 0;
 }
