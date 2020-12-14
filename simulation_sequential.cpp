@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
   // Count the times of countinuously getting a non-star-6 operator
   unsigned long long int pity_count = 0;
   // Count the times of pulling. Will be reset to 0 when get the target star 6 operator
-  // TODO: use uint_fast64_t?
   // Theoretically, no matter how many bits used to store the 
   // current_pull_count, there exists a non-zero probability it
   // will overflow - but the probability will converge to zero when
