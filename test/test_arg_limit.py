@@ -8,7 +8,9 @@ valgrind_flag = "--leak-check=full --show-leak-kinds=all"
 valgrind_keywords = "All heap blocks were freed -- no leaks are possible"
 
 # test cases: a list of ["./executable args", "expect_values"]
-test_case = [["./cmd_parse_unitest -t 18446744073709551615", "1"]
+test_case = [
+  # test -t|--total-pull-time
+  ["./cmd_parse_unitest -t 18446744073709551615", "1"]
 , ["./cmd_parse_unitest -t 18446744073709551616", "1"]
 , ["./cmd_parse_unitest -t 18446744073709551614", "1"]
 , ["./cmd_parse_unitest -t 9223372036854775807", "1"]
@@ -33,6 +35,46 @@ test_case = [["./cmd_parse_unitest -t 18446744073709551615", "1"]
 , ["./cmd_parse_unitest --total-pull-time -9223372036854775807", "0"]
 , ["./cmd_parse_unitest --total-pull-time -9223372036854775808", "0"]
 , ["./cmd_parse_unitest --total-pull-time -9223372036854775806", "0"]
+
+, ["./cmd_parse_unitest --total-pull-time 18446744073709551615", "1"]
+, ["./cmd_parse_unitest --total-pull-time 18446744073709551616", "1"]
+, ["./cmd_parse_unitest --total-pull-time 18446744073709551614", "1"]
+, ["./cmd_parse_unitest --total-pull-time 9223372036854775807", "1"]
+, ["./cmd_parse_unitest --total-pull-time 9223372036854775808", "1"]
+, ["./cmd_parse_unitest --total-pull-time 9223372036854775806", "1"]
+, ["./cmd_parse_unitest --total-pull-time -18446744073709551616", "0"]
+, ["./cmd_parse_unitest --total-pull-time -18446744073709551615", "0"]
+, ["./cmd_parse_unitest --total-pull-time -18446744073709551617", "0"]
+, ["./cmd_parse_unitest --total-pull-time -9223372036854775807", "0"]
+, ["./cmd_parse_unitest --total-pull-time -9223372036854775808", "0"]
+, ["./cmd_parse_unitest --total-pull-time -9223372036854775806", "0"]
+
+# test -p|--pity
+, ["./cmd_parse_unitest -p 4294967295", "1"]
+, ["./cmd_parse_unitest -p 4294967296", "1"]
+, ["./cmd_parse_unitest -p 4294967294", "1"]
+, ["./cmd_parse_unitest -p 2147483647", "1"]
+, ["./cmd_parse_unitest -p 2147483648", "1"]
+, ["./cmd_parse_unitest -p 2147483646", "1"]
+, ["./cmd_parse_unitest -p -4294967295", "0"]
+, ["./cmd_parse_unitest -p -4294967296", "0"]
+, ["./cmd_parse_unitest -p -4294967294", "0"]
+, ["./cmd_parse_unitest -p -2147483647", "0"]
+, ["./cmd_parse_unitest -p -2147483648", "0"]
+, ["./cmd_parse_unitest -p -2147483646", "0"]
+
+, ["./cmd_parse_unitest --pity 4294967295", "1"]
+, ["./cmd_parse_unitest --pity 4294967296", "1"]
+, ["./cmd_parse_unitest --pity 4294967294", "1"]
+, ["./cmd_parse_unitest --pity 2147483647", "1"]
+, ["./cmd_parse_unitest --pity 2147483648", "1"]
+, ["./cmd_parse_unitest --pity 2147483646", "1"]
+, ["./cmd_parse_unitest --pity -4294967295", "0"]
+, ["./cmd_parse_unitest --pity -4294967296", "0"]
+, ["./cmd_parse_unitest --pity -4294967294", "0"]
+, ["./cmd_parse_unitest --pity -2147483647", "0"]
+, ["./cmd_parse_unitest --pity -2147483648", "0"]
+, ["./cmd_parse_unitest --pity -2147483646", "0"]
 
 ]
 

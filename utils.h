@@ -69,7 +69,7 @@ void display_help_message() {
   std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
                "--help : Display the help message\n"
                "--t|--total-pull-time : Set the time of pulling in a simulation\n"
-               "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux/C++17\n"
+               "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux 64bit/C++17\n"
                "                        Note : This is not the experiment time\n"
                "                        Note : If you provide a number greather than 18446744073709551615, the\n"
                "                               program will run the simulation with maximum valid times (i.e., 18446744073709551615)\n"
@@ -79,7 +79,7 @@ void display_help_message() {
                "                        Cannot be specified with --regular at the same time\n"
                "               --pity : Set the starting point where the pity system comes into effect,\n"
                "                        i.e., you will get a higher probability on the specified pull's next pull\n"
-               "                        Valid value is an integer between [1, 4294967295] on Linux/C++17\n"
+               "                        Valid value is an integer between [1, 4294967295] on Linux 64bit/C++17\n"
                "                        Note: If you provide a number greater than 4294967295, the program will run the\n"
                "                              simulation with maximum valid value for pity starting time (i.e., 4294967295)\n"
                "     -n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"
@@ -364,14 +364,20 @@ bool process_cmd_input_and_set_corres_var(
     }
   }
 
-  long int pity_starting_temp = -1;
+  unsigned long int pity_starting_temp = 0;
+  long int pity_starting_temp_compare = 0;
   if (iter_pity != arg_map.cend()) {
     if (iter_pity->second.size() > 1) {
       error_flag.err_invalid_value_for_pity_ctrl_arg = true;
-    } else if (iter_pity->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+    } 
+    else if (iter_pity->second.size() > 0) {
       char* p_end = nullptr;
-      pity_starting_temp = strtol(iter_pity->second[0].c_str(), &p_end, 10);
-      if (*p_end != '\0' || pity_starting_temp < 0) {
+      char* p_end_compare = nullptr;
+      pity_starting_temp = strtoul(iter_pity->second[0].c_str(), &p_end, 10);
+      pity_starting_temp_compare =
+          strtol(iter_pity->second[0].c_str(), &p_end_compare, 10);
+      if (*p_end != '\0' || *p_end_compare != '\0' ||
+          pity_starting_temp_compare < 0) {
         error_flag.err_invalid_value_for_pity_ctrl_arg = true;
       }
     }
@@ -379,15 +385,20 @@ bool process_cmd_input_and_set_corres_var(
   if (iter_pity_long_name != arg_map.cend()) {
     if (iter_pity_long_name->second.size() > 1) {
       error_flag.err_invalid_value_for_pity_long_name_ctrl_arg = true;
-    } else if (iter_pity_long_name->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+    } else if (iter_pity_long_name->second.size() > 0) {
       char* p_end = nullptr;
-      pity_starting_temp = strtol(iter_pity_long_name->second[0].c_str(), &p_end, 10);
-      if (*p_end != '\0' || pity_starting_temp < 0) {
+      char* p_end_compare = nullptr;
+      pity_starting_temp =
+          strtoul(iter_pity_long_name->second[0].c_str(), &p_end, 10);
+      pity_starting_temp_compare =
+          strtol(iter_pity_long_name->second[0].c_str(), &p_end_compare, 10);
+      if (*p_end != '\0' || *p_end_compare != '\0' ||
+          pity_starting_temp_compare < 0) {
         error_flag.err_invalid_value_for_pity_long_name_ctrl_arg = true;
       }
     }
   }
-  
+
   long int num_rate_up_temp = -1;
   if (iter_num_rate_up != arg_map.cend()) {
     if (iter_num_rate_up->second.size() > 1) {

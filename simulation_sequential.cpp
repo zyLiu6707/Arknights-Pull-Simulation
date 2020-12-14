@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
   // In arknights, the pity system will comes into effect on the 51th pull
   // if you did not get any star6 operator in the past 50 pulls
-  unsigned int pity_starting_point = 50;  // BUG: overflow!
+  unsigned int pity_starting_point = 50;
 
   unsigned long long int total_pull_time = 100000000;
 
@@ -41,7 +41,11 @@ int main(int argc, char* argv[]) {
   unsigned int pity_count = 0;
   // Count the times of pulling. Will be reset to 0 when get the target star 6 operator
   // TODO: use uint_fast64_t?
-  unsigned long long int current_pull_count = 0;
+  // Theoretically, no matter how many bits used to store the 
+  // current_pull_count, there exists a non-zero probability it
+  // will overflow - but the probability will converge to zero when
+  // num of bits grows
+  unsigned long long int current_pull_count = 0;  
 
   // The thresholds will be used to decide whether we got a star6/target star6
   // operator in a pull
