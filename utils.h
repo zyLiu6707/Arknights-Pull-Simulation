@@ -55,9 +55,7 @@ double calc_time(const struct timespec& start, const struct timespec& end) {
 
 // Generate a random number using random_device to make sure the seed
 // is different each time in each Monte Carlo simulation
-
-// TODO: cancel auto here... not very necessary ot use c++17
-auto get_random_seed() {
+uint_fast64_t get_random_seed() {
   std::random_device rd;  // uses RDRND or /dev/urandom
                           // if you want use a specific token, do not use
                           // "/dev/random" on Linux, which is much slower
@@ -72,7 +70,7 @@ void display_help_message() {
   std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
                "--help : Display the help message\n"
                "--t|--total-pull-time : Set the time of pulling in a simulation\n"
-               "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux 64bit/C++17\n"
+               "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux 64bit/C++11\n"
                "                        Note : This is not the experiment time\n"
                "                        Note : If you provide a number greather than 18446744073709551615, the\n"
                "                               program will run the simulation with maximum valid times (i.e., 18446744073709551615)\n"
@@ -82,7 +80,7 @@ void display_help_message() {
                "                        Cannot be specified with --regular at the same time\n"
                "               --pity : Set the starting point where the pity system comes into effect,\n"
                "                        i.e., you will get a higher probability on the specified pull's next pull\n"
-               "                        Valid value is an integer between [1, 4294967295] on Linux 64bit/C++17\n"
+               "                        Valid value is an integer between [1, 4294967295] on Linux 64bit/C+11\n"
                "                        Note: If you provide a number greater than 4294967295, the program will run the\n"
                "                              simulation with maximum valid value for pity starting time (i.e., 4294967295)\n"
                "     -n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"

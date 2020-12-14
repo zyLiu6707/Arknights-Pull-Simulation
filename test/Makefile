@@ -1,6 +1,6 @@
 CXX = g++
 
-CFLAGS = -std=c++17 -g -pedantic -Wall -Werror
+CFLAGS = -std=c++11 -g -pedantic -Wall -Werror
 
 OBJS = cmd_parse_unitest.o dbg_probability_wrapper.o
 

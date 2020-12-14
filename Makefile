@@ -1,6 +1,6 @@
 CXX = g++
 
-CFLAGS = -std=c++17 -O3 -pedantic -Wall -Werror
+CFLAGS = -std=c++11 -O3 -pedantic -Wall -Werror
 
 OBJS = simulation_sequential.o probability_wrapper.o
 
