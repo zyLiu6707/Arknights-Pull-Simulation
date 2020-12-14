@@ -55,6 +55,8 @@ double calc_time(const struct timespec& start, const struct timespec& end) {
 
 // Generate a random number using random_device to make sure the seed
 // is different each time in each Monte Carlo simulation
+
+// TODO: cancel auto here... not very necessary ot use c++17
 auto get_random_seed() {
   std::random_device rd;  // uses RDRND or /dev/urandom
                           // if you want use a specific token, do not use
@@ -63,6 +65,7 @@ auto get_random_seed() {
   auto random_seed = mt64();
   return random_seed;
 }
+
 
 // Display the help message
 void display_help_message() {

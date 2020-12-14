@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
   // Count the times of getting the target star 6 operator in total_pull_times pulling
   unsigned long long int target_star6_count = 0;
   // Count the times of countinuously getting a non-star-6 operator
-  unsigned int pity_count = 0;
+  unsigned long long int pity_count = 0;
   // Count the times of pulling. Will be reset to 0 when get the target star 6 operator
   // TODO: use uint_fast64_t?
   // Theoretically, no matter how many bits used to store the 
@@ -49,10 +49,10 @@ int main(int argc, char* argv[]) {
 
   // The thresholds will be used to decide whether we got a star6/target star6
   // operator in a pull
-  const unsigned int init_target_star6_threshold = probability_wrapper.calc_init_target_star6_threshold(dist_left_border, dist_right_border);
-  const unsigned int init_star6_threshold = probability_wrapper.calc_init_star6_threshold(dist_left_border, dist_right_border);
-  unsigned int target_star6_threshold = init_target_star6_threshold;
-  unsigned int star6_threshold = init_star6_threshold;
+  const unsigned long long int init_target_star6_threshold = probability_wrapper.calc_init_target_star6_threshold(dist_left_border, dist_right_border);
+  const unsigned long long int init_star6_threshold = probability_wrapper.calc_init_star6_threshold(dist_left_border, dist_right_border);
+  unsigned long long int target_star6_threshold = init_target_star6_threshold;
+  unsigned long long int star6_threshold = init_star6_threshold;
 
   // The amount of change each time for the thresholds when pity system comes into effect
   unsigned int delta_star6_threshold = probability_wrapper.calc_star6_threshold_change_step(dist_left_border, dist_right_border);
@@ -105,9 +105,8 @@ int main(int argc, char* argv[]) {
       star6_threshold = init_star6_threshold;
       target_star6_threshold = init_target_star6_threshold;
     } else {
-      pity_count++;  // BUG: might (though almost not possible) overflow!
+      pity_count++;
       if (pity_count > pity_starting_point) {
-        // BUG: these thresholds might (though almost not possible) overflow!
         star6_threshold += delta_star6_threshold;
         target_star6_threshold += delta_target_star6_threshold;
       }

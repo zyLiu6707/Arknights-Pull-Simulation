@@ -45,13 +45,15 @@ class ProbabilityWrapper {
 
   // calculate the initial threshold of getting a any star 6 operator
   // based on the range of uniform int distribution
-  double calc_init_star6_threshold(const unsigned int dist_left_border, 
-                                   const unsigned int dist_right_border);
+  unsigned long long int calc_init_star6_threshold(
+      const unsigned int dist_left_border,
+      const unsigned int dist_right_border);
 
   // calculate the initial threshold of getting a specific star 6 operator
   // based on the range of uniform int distribution
-  double calc_init_target_star6_threshold(const unsigned int dist_left_border,
-                                          const unsigned int dist_right_border);
+  unsigned long long int calc_init_target_star6_threshold(
+      const unsigned int dist_left_border,
+      const unsigned int dist_right_border);
 
   // calculate the change step of the threshold of getting a any star 6 operator
   // after the pity system comming into effect
