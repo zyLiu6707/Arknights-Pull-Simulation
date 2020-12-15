@@ -360,7 +360,7 @@ bool process_cmd_input_and_set_corres_var(
       if (*p_end != '\0' || *p_end_compare != '\0' ||  // not a number
           total_pull_time_temp_compare <= 0            // non positive value
       ) {
-        error_flag.err_invalid_value_for_total_pull_time_ctrl_arg = true;
+        error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg = true;
       }
     }
   }
