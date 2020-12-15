@@ -80,7 +80,7 @@ void display_help_message() {
                "                        Cannot be specified with --regular at the same time\n"
                "               --pity : Set the starting point where the pity system comes into effect,\n"
                "                        i.e., you will get a higher probability on the specified pull's next pull\n"
-               "                        Valid value is an integer between [1, 4294967295] on Linux 64bit/C+11\n"
+               "                        Valid value is an integer between [0, 4294967295] on Linux 64bit/C+11\n"
                "                        Note: If you provide a number greater than 4294967295, the program will run the\n"
                "                              simulation with maximum valid value for pity starting time (i.e., 4294967295)\n"
                "     -n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"
