@@ -40,10 +40,10 @@ int main(int argc, char* argv[]) {
   // Count the times of countinuously getting a non-star-6 operator
   unsigned long long int pity_count = 0;
   // Count the times of pulling. Will be reset to 0 when get the target star 6 operator
-  // Theoretically, no matter how many bits used to store the 
-  // current_pull_count, there exists a non-zero probability it
+  // Theoretically, no matter how many bits used to store the value of
+  // current_pull_count, there exists a non-zero probability that it
   // will overflow - but the probability will converge to zero when
-  // num of bits grows
+  // num of bits grows to positive infinity
   unsigned long long int current_pull_count = 0;  
 
   // The thresholds will be used to decide whether we got a star6/target star6
