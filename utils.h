@@ -213,37 +213,27 @@ bool process_cmd_input_and_set_corres_var(
   ErrorFlag error_flag;
 
   // Parse the inputs
+  int curr_ctrl_arg_idx = 0;
+  bool skip_identical_ctrl_arg = false;
   for (int i = 1; i < argc; ++i) {
-    if (expected_control_arg.find(argv[i]) != expected_control_arg.end()) {
-      if (arg_map.count(argv[i]) == 0) {
-        // For arguments that do not need a detailed value, i.e., --help,
-        // --regular and --limited, just put an empty vector of string
-        // along with this key
-        arg_map[argv[i]];
-        for (int j = i + 1; j < argc; ++j) {
-          if (expected_control_arg.find(argv[j]) != expected_control_arg.end()) {
-            break;
-          }
-          // Not a (attempt) control arg:
-          // 1. not starts with '-', OR
-          // 2. ...if starts with a '-', then the second char must be a number
-          else if (argv[j][0] != '-' || isdigit(argv[j][1])) {
-            arg_map[argv[i]].push_back(argv[j]);
-          }
-        }
-      } 
-      else {
-        // Situation that exact same control arg appears more than once
-        error_flag.err_redundant_identical_ctrl_arg = true;
-        // break;
-      }
-    } 
-    // Starts with a '-' and the second char (if exists) is not a number, 
+    // Starts with a '-' and the second char (if exists) is not a number,
     // then we regards this is an (attempted) control arugments
     // Note: isdigit will regard the '\0' in argv as a non-number character
-    else if (argv[i][0] == '-' && !isdigit(argv[i][1])) {
-      error_flag.err_invalid_ctrl_args = true;
-      error_flag.invalid_ctrl_args_list.push_back(argv[i]);
+    if (argv[i][0] == '-' && !isdigit(argv[i][1])) {
+      if (arg_map.count(argv[i]) > 0) {
+        skip_identical_ctrl_arg = true;
+        if (expected_control_arg.find(argv[i]) != expected_control_arg.end()) {
+          error_flag.err_redundant_identical_ctrl_arg = true;
+        }
+        continue;
+      }
+      arg_map[argv[i]];
+      curr_ctrl_arg_idx = i;
+      skip_identical_ctrl_arg = false;
+    } else if (!skip_identical_ctrl_arg &&
+               arg_map.size() > 0)  // to prevent test case like ./<prog name> 2
+    {
+      arg_map[argv[curr_ctrl_arg_idx]].push_back(argv[i]);
     }
   }
 
@@ -262,7 +252,6 @@ bool process_cmd_input_and_set_corres_var(
     }
   }
 
-
   // Now check whether the command line arguments are invalid
   // Argument error priority order:
   // too many arg > redundant arg > conflict arg > missing value > invalid value
@@ -273,9 +262,16 @@ bool process_cmd_input_and_set_corres_var(
   const auto iter_num_rate_up = arg_map.find("-n");
   const auto iter_num_rate_up_long_name = arg_map.find("--num-rate-up");
 
-  // Check whether the first argument (i.e., argv[1]) is invalid
-  if (expected_control_arg.find(std::string(argv[1])) == expected_control_arg.end()) {
+  // Check whether the first argument (i.e., argv[1]) is an unexpected arg
+  if (argv[1][0] != '-' || isdigit(argv[1][1])) {
     error_flag.err_unexpected_arguments_at_the_beginning = true;
+  }
+  // Check whether there is invalid control arg
+  for (const auto& p : arg_map) {
+    if (expected_control_arg.find(p.first) == expected_control_arg.end()) {
+      error_flag.err_invalid_ctrl_args = true;
+      error_flag.invalid_ctrl_args_list.push_back(p.first);
+    }
   }
   // Check another situation of redundant control arguments
   if (iter_total_pull_time != arg_map.end() &&
