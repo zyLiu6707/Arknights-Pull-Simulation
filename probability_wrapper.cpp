@@ -47,13 +47,13 @@ unsigned long long int ProbabilityWrapper::calc_init_target_star6_threshold(
 // after the pity system comming into effect
 unsigned int ProbabilityWrapper::calc_star6_threshold_change_step(const unsigned int dist_left_border,
                                                                   const unsigned int dist_right_border) {
-  return (dist_right_border - dist_left_border + 1) * delta_base_star6_rate;
+  return static_cast<unsigned int>((dist_right_border - dist_left_border + 1) * delta_base_star6_rate);
 }
 
 // calculate the change step of the threshold of getting the target star 6
 // operator after the pity system comming into effect
 unsigned int ProbabilityWrapper::calc_target_star6_threshold_change_step(const unsigned int dist_left_border,
                                                                          const unsigned int dist_right_border) {
-  return calc_star6_threshold_change_step(dist_left_border, dist_right_border) *
-         on_banner_star6_conditional_rate / banner_operator_num;
+  return static_cast<unsigned int>(calc_star6_threshold_change_step(dist_left_border, dist_right_border) *
+         on_banner_star6_conditional_rate / banner_operator_num);
 }
