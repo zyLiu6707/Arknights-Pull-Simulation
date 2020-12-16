@@ -39,7 +39,8 @@ class ProbabilityWrapper {
   const unsigned int get_banner_operator_num() const;
 
   // Setters
-  void set_on_banner_star6_conditional_rate(double _on_banner_star6_conditoinal_rate);
+  void set_on_banner_star6_conditional_rate(
+      double _on_banner_star6_conditoinal_rate);
 
   void set_banner_operator_num(unsigned int _banner_operator_num);
 
@@ -57,13 +58,15 @@ class ProbabilityWrapper {
 
   // calculate the change step of the threshold of getting a any star 6 operator
   // after the pity system comming into effect
-  unsigned int calc_star6_threshold_change_step(const unsigned int dist_left_border,
-                                                const unsigned int dist_right_border);
+  unsigned int calc_star6_threshold_change_step(
+      const unsigned int dist_left_border,
+      const unsigned int dist_right_border);
 
-  // calculate the change step of the threshold of getting the target star 6 operator
-  // after the pity system comming into effect
-  unsigned int calc_target_star6_threshold_change_step(const unsigned int dist_left_border,
-                                                       const unsigned int dist_right_border);
+  // calculate the change step of the threshold of getting the target star 6
+  // operator after the pity system comming into effect
+  unsigned int calc_target_star6_threshold_change_step(
+      const unsigned int dist_left_border,
+      const unsigned int dist_right_border);
 };
 
 #endif  // PROBABILITY_WRAPPER_H

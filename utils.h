@@ -18,8 +18,10 @@ const double limited_banner_on_banner_star6_conditional_rate = 0.7;
 const double regular_banner_on_banner_star6_conditional_rate = 0.5;
 
 // Pre-defined parameters for displaying the results
-const size_t raw_data_showing_limit = 100;  // display up to this much raw data
-const size_t rare_event_showing_limit = 10;  // display up to this much rare events
+// maximum number of raw data to show
+const size_t raw_data_showing_limit = 100;
+// maximum number of rare event to show
+const size_t rare_event_showing_limit = 10;
 
 /* For debugging purpose */
 // Print the content in arg_map
@@ -54,7 +56,7 @@ double calc_time(const struct timespec& start, const struct timespec& end) {
 }
 
 // Generate a random number using random_device to make sure the seed
-// is different each time in each Monte Carlo simulation
+// is varied from different times you run the Monte Carlo simulation
 uint_fast64_t get_random_seed() {
   std::random_device rd;  // uses RDRND or /dev/urandom
                           // if you want use a specific token, do not use
@@ -91,6 +93,7 @@ void display_help_message() {
   return;
 }
 
+// Show the corresponding error message according to the flags in ErrorFlag
 void display_error_detail(const ErrorFlag& error_flag) {
   if (error_flag.check_err()) {
     std::cerr << "The provided command line arguments are invalid due to the following error(s):\n";
@@ -175,18 +178,21 @@ void display_error_detail(const ErrorFlag& error_flag) {
     }
     std::cerr << "Please check and correct the error(s)\nYou can refer to help message, README, or visit the online repo:\n"
                  "https://github.com/zyLiu6707/Arknights-Gacha-Simulation\n" << std::endl;
+
     display_help_message();
   }
 }
 
-// Read the command line inputs, check the potential errors.
+// Read the command line input, check the potential errors in the input.
 // If the input is valid, set the corresponding field in ProbabilityWrapper
-// and other variables.
-// Return a bool flag with true value if the input is valid, which will
-// indicates the main simulation program whether can continue running
+// and other variables that will be used during the simulation. Otherwise, raise
+// the corresponding flags in ErrorFlag and show the appropriate message. 
+// Return a bool flag with true value if the input is valid, which will indicates
+// the main simulation program whether can continue running
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
-    unsigned long long int& total_pull_time, unsigned int& pity_starting_point) {
+    unsigned long long int& total_pull_time,
+    unsigned int& pity_starting_point) {
   const int expected_max_arg_num = 8;
   if (argc > expected_max_arg_num) {
     std::cerr << "Too many arguments!" << std::endl;
@@ -199,15 +205,16 @@ bool process_cmd_input_and_set_corres_var(
   }
 
   // Control arguments are those that can specify the behavior of the
-  // program, i.e., display help message, simulate a regular banner or 
-  // a limited banner, etc.
-  std::unordered_set<std::string> expected_control_arg( {"--help", "-t", "--total-pull-time",
-                                                         "--limited", "--regular", "-p", "--pity", "-n", "--num-rate-up"} );
+  // program, i.e., display help message, simulate a regular banner or
+  // a limited banner, etc. Starts with at lease one dash '-'
+  std::unordered_set<std::string> expected_control_arg(
+      {"--help", "-t", "--total-pull-time", "--limited", "--regular", "-p",
+       "--pity", "-n", "--num-rate-up"});
 
-  // Store control argument in expected_control_arg as key and the non-control
-  // argument follows it as elements in value, which is a vector of string.
-  // The content in this map will be checked and conrresponding error flag will
-  // be set if the command line input is invalid.
+  // Store control argument as arg_map's key, and ctrl arg's value as arg_map's
+  // value. 
+  // The content in this map will be checked and conrresponding error
+  // flag will be set if corresponding type of error is detected.
   std::unordered_map<std::string, std::vector<std::string>> arg_map;
 
   // A wrapper class for different kinds of error flags
@@ -232,7 +239,8 @@ bool process_cmd_input_and_set_corres_var(
       curr_ctrl_arg_idx = i;
       skip_identical_ctrl_arg = false;
     } else if (!skip_identical_ctrl_arg &&
-               arg_map.size() > 0)  // to prevent test case like ./<prog name> 2
+               arg_map.size() > 0)  // to avoid the case like "./<prog_name> 2"
+                                    // that will insert the value 2 into arg_map
     {
       arg_map[argv[curr_ctrl_arg_idx]].push_back(argv[i]);
     }
@@ -242,20 +250,20 @@ bool process_cmd_input_and_set_corres_var(
   print_arg_map_contents(arg_map);
 #endif
 
-  // If --help is specified, ignore all other arguments and print the help message
+  // If --help is specified, ignore all other arguments and print the help
+  // message
   if (arg_map.find("--help") != arg_map.end()) {
     if (argc == 2) {
       display_help_message();
       return false;
-    }
-    else {
+    } else {
+      // If --help and other arguments are specified at the same time, show the
+      // appropriate message
       error_flag.err_help_ctrl_arg_with_other_args = true;
     }
   }
 
   // Now check whether the command line arguments are invalid
-  // Argument error priority order:
-  // too many arg > redundant arg > conflict arg > missing value > invalid value
   const auto iter_total_pull_time = arg_map.find("-t");
   const auto iter_total_pull_time_long_name = arg_map.find("--total-pull-time");
   const auto iter_pity = arg_map.find("-p");
@@ -274,13 +282,13 @@ bool process_cmd_input_and_set_corres_var(
       error_flag.invalid_ctrl_args_list.push_back(p.first);
     }
   }
-  // Check another situation of redundant control arguments
+  // Check whether the short name and the long name of the same type of ctrl
+  // arg are specified at the same time
   if (iter_total_pull_time != arg_map.end() &&
       iter_total_pull_time_long_name != arg_map.end()) {
     error_flag.err_redundant_total_pull_time_ctrl_arg = true;
   }
-  if (iter_pity != arg_map.end() &&
-      iter_pity_long_name != arg_map.end()) {
+  if (iter_pity != arg_map.end() && iter_pity_long_name != arg_map.end()) {
     error_flag.err_redundant_pity_ctrl_arg = true;
   }
   if (iter_num_rate_up != arg_map.end() &&
@@ -295,31 +303,35 @@ bool process_cmd_input_and_set_corres_var(
     error_flag.err_conflict_ctrl_arg_flag = true;
   }
 
-  // Check whether missing a specific value for control arguments that need one,
-  // i.e., -t/--total-pull-time, -p/--pity
-  if (iter_total_pull_time != arg_map.cend() && iter_total_pull_time->second.size() == 0) {
+  // Check whether missing a specific value for control arguments that expect one,
+  // i.e., -t/--total-pull-time, -p/--pity and -n/--num-rate-up
+  if (iter_total_pull_time != arg_map.cend() &&
+      iter_total_pull_time->second.size() == 0) {
     error_flag.err_missing_value_for_total_pull_time_ctrl_arg = true;
-  } else if (iter_total_pull_time_long_name != arg_map.cend() && iter_total_pull_time_long_name->second.size() == 0) {
+  } else if (iter_total_pull_time_long_name != arg_map.cend() &&
+             iter_total_pull_time_long_name->second.size() == 0) {
     error_flag.err_missing_value_for_total_pull_time_long_name_ctrl_arg = true;
   }
 
   if (iter_pity != arg_map.cend() && iter_pity->second.size() == 0) {
     error_flag.err_missing_value_for_pity_ctrl_arg = true;
-  } else if (iter_pity_long_name != arg_map.cend() && iter_pity_long_name->second.size() == 0) {
+  } else if (iter_pity_long_name != arg_map.cend() &&
+             iter_pity_long_name->second.size() == 0) {
     error_flag.err_missing_value_for_pity_long_name_ctrl_arg = true;
   }
-  
-  if (iter_num_rate_up != arg_map.cend() && iter_num_rate_up->second.size() == 0) {
+
+  if (iter_num_rate_up != arg_map.cend() &&
+      iter_num_rate_up->second.size() == 0) {
     error_flag.err_missing_value_for_num_rate_up_ctrl_arg = true;
-  } else if (iter_num_rate_up_long_name != arg_map.cend() && iter_num_rate_up_long_name->second.size() == 0) {
+  } else if (iter_num_rate_up_long_name != arg_map.cend() &&
+             iter_num_rate_up_long_name->second.size() == 0) {
     error_flag.err_missing_value_for_num_rate_up_long_name_ctrl_arg = true;
   }
 
-  // Check the format of specific value for control arguments that need one,
-  // i.e., -t/--total-pull-time, -p/--pity
-  // the specific values are required to be positive integer; If the format is
-  // correct, then retrieve the argument value
-  // To receive the final value if valid, up to 2^64 - 1
+  // Check the format of specific value for control arguments that expect one.
+  // If the format is correct, then retrieve the argument value by converting
+  // string to integer
+  // To receive the final value if valid, max value is 2^64 - 1
   unsigned long long int total_pull_time_temp = 0;
   // To check whether provided a negative value
   long long int total_pull_time_temp_compare = 0;
@@ -345,19 +357,19 @@ bool process_cmd_input_and_set_corres_var(
   if (iter_total_pull_time_long_name != arg_map.cend()) {
     if (iter_total_pull_time_long_name->second.size() > 1) {
       error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg = true;
-    }
-    // Must be a non-empty vector to be able call strtol
-    else if (iter_total_pull_time_long_name->second.size() > 0) {
+    } else if (iter_total_pull_time_long_name->second.size() > 0) {
       char* p_end = nullptr;
       char* p_end_compare = nullptr;
-      total_pull_time_temp =
-          strtoull(iter_total_pull_time_long_name->second[0].c_str(), &p_end, 10);
+      total_pull_time_temp = strtoull(
+          iter_total_pull_time_long_name->second[0].c_str(), &p_end, 10);
       total_pull_time_temp_compare =
-          strtoll(iter_total_pull_time_long_name->second[0].c_str(), &p_end_compare, 10);
+          strtoll(iter_total_pull_time_long_name->second[0].c_str(),
+                  &p_end_compare, 10);
       if (*p_end != '\0' || *p_end_compare != '\0' ||  // not a number
           total_pull_time_temp_compare <= 0            // non positive value
       ) {
-        error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg = true;
+        error_flag.err_invalid_value_for_total_pull_time_long_name_ctrl_arg =
+            true;
       }
     }
   }
@@ -367,8 +379,7 @@ bool process_cmd_input_and_set_corres_var(
   if (iter_pity != arg_map.cend()) {
     if (iter_pity->second.size() > 1) {
       error_flag.err_invalid_value_for_pity_ctrl_arg = true;
-    } 
-    else if (iter_pity->second.size() > 0) {
+    } else if (iter_pity->second.size() > 0) {
       char* p_end = nullptr;
       char* p_end_compare = nullptr;
       pity_starting_temp = strtoul(iter_pity->second[0].c_str(), &p_end, 10);
@@ -401,11 +412,10 @@ bool process_cmd_input_and_set_corres_var(
   if (iter_num_rate_up != arg_map.cend()) {
     if (iter_num_rate_up->second.size() > 1) {
       error_flag.err_invalid_value_for_num_rate_up_ctrl_arg = true;
-    } else if (iter_num_rate_up->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+    } else if (iter_num_rate_up->second.size() > 0) {
       char* p_end = nullptr;
-      num_rate_up_temp = strtol(iter_num_rate_up->second[0].c_str(), &p_end, 10);
-      // Currently the valid values for num_rate_up_temp (hence for num_rate_up)
-      // are 1 and 2
+      num_rate_up_temp =
+          strtol(iter_num_rate_up->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || (num_rate_up_temp != 1 && num_rate_up_temp != 2)) {
         error_flag.err_invalid_value_for_num_rate_up_ctrl_arg = true;
       }
@@ -414,19 +424,18 @@ bool process_cmd_input_and_set_corres_var(
   if (iter_num_rate_up_long_name != arg_map.cend()) {
     if (iter_num_rate_up_long_name->second.size() > 1) {
       error_flag.err_invalid_value_for_num_rate_up_long_name_ctrl_arg = true;
-    } else if (iter_num_rate_up_long_name->second.size() > 0) {  // must be a non-empty vector to be able call strtol
+    } else if (iter_num_rate_up_long_name->second.size() > 0) {
       char* p_end = nullptr;
-      num_rate_up_temp = strtol(iter_num_rate_up_long_name->second[0].c_str(), &p_end, 10);
-      // Currently the valid values for num_rate_up_temp (hence for num_rate_up)
-      // are 1 and 2
+      num_rate_up_temp =
+          strtol(iter_num_rate_up_long_name->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || (num_rate_up_temp != 1 && num_rate_up_temp != 2)) {
         error_flag.err_invalid_value_for_num_rate_up_long_name_ctrl_arg = true;
       }
     }
   }
 
-  // Check whether there is unexpected values for the control arguments
-  // --regular and --limited
+  // Check whether there is unexpected values for the control
+  // arguments --regular and --limited
   if (arg_map.count("--regular") == 1 && arg_map["--regular"].size() != 0) {
     error_flag.err_unexpected_value_for_ctrl_arg_regular = true;
   }
@@ -446,11 +455,11 @@ bool process_cmd_input_and_set_corres_var(
           limited_banner_on_banner_star6_conditional_rate);
     }
     // Set the value of -t|--total-pull-time
-    if (iter_total_pull_time != arg_map.cend() ) {
+    if (iter_total_pull_time != arg_map.cend()) {
       assert(iter_total_pull_time->second.size() == 1);
       total_pull_time = total_pull_time_temp;
     }
-    if (iter_total_pull_time_long_name != arg_map.cend() ) {
+    if (iter_total_pull_time_long_name != arg_map.cend()) {
       assert(iter_total_pull_time_long_name->second.size() == 1);
       total_pull_time = total_pull_time_temp;
     }
@@ -503,11 +512,11 @@ void display_simulation_settings(const ProbabilityWrapper& probability_wrapper,
 // Display the simulation results
 void display_simulation_results(
     const std::vector<unsigned long long int>& result,
-    std::unordered_map<unsigned long long int, unsigned long long int>& rare_event,
-    unsigned long long int star6_count, unsigned long long int target_star6_count,
-    unsigned int seed, const struct timespec& start,
-    const struct timespec& end) {
-
+    std::unordered_map<unsigned long long int, unsigned long long int>&
+        rare_event,
+    unsigned long long int star6_count,
+    unsigned long long int target_star6_count, unsigned int seed,
+    const struct timespec& start, const struct timespec& end) {
   // Simulation summary
   std::cout << "Time spent: " << calc_time(start, end) << "s" << std::endl;
   std::cout << "Random seed for this simulation: " << seed << std::endl;
@@ -557,14 +566,10 @@ void display_simulation_results(
   }
 
   std::cout << std::endl;
-  std::cout << "Note: Since the rare events are very sensitive to the error of "
-               "the actual distribution\n"
-               "      of generated random numbers (i.e., we want a perfect "
-               "uniform distribution, but\n"
-               "      there would be error under limited times of random "
-               "number generating), the\n"
-               "      estimated probabilities for these rare events will not "
-               "be accurate.\n"
+  std::cout << "Note: Since the rare events are very sensitive to the error of the actual distribution\n"
+               "      of generated random numbers (i.e., we want a perfect uniform distribution, but\n"
+               "      there would be error under limited times of random number generating), the\n"
+               "      estimated probabilities for these rare events will not be accurate.\n"
                "      Hence will not show the estimated probabilities of those rare events."
             << std::endl;
 

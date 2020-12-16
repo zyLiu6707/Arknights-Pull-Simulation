@@ -2,8 +2,8 @@
 
 int main(int argc, char* argv[]) {
   // On default, will calculate the probability of a limited banner (e.g.,
-  // Nian, W and Rosmontis banner), which uses the following parameter: 
-  // 1. Pr(get a star6 operator): 2% 
+  // Nian, W and Rosmontis banner), which uses the following parameter:
+  // 1. Pr(get a star6 operator): 2%
   // 2. Pr(get a on-banner star 6 operator | get a satr 6 operator): 70%
   // 3. Double rate up
   ProbabilityWrapper probability_wrapper(0.02, 0.7, 0.02, 2);
@@ -35,46 +35,51 @@ int main(int argc, char* argv[]) {
 
   // Count the times of getting a star 6 operator in total_pull_times pulling
   unsigned long long int star6_count = 0;
-  // Count the times of getting the target star 6 operator in total_pull_times pulling
+  // Count the times of getting the target star 6 operator in total_pull_times
+  // pulling
   unsigned long long int target_star6_count = 0;
   // Count the times of countinuously getting a non-star-6 operator
   unsigned long long int pity_count = 0;
-  // Count the times of pulling. Will be reset to 0 when get the target star 6 operator
-  // Theoretically, no matter how many bits used to store the value of
+  // Count the times of pulling. Will be reset to 0 when get the target star 6
+  // operator Theoretically, no matter how many bits used to store the value of
   // current_pull_count, there exists a non-zero probability that it
   // will overflow - but the probability will converge to zero when
   // num of bits grows to positive infinity
-  unsigned long long int current_pull_count = 0;  
+  unsigned long long int current_pull_count = 0;
 
   // The thresholds will be used to decide whether we got a star6/target star6
   // operator in a pull
-  const unsigned long long int init_target_star6_threshold = probability_wrapper.calc_init_target_star6_threshold(dist_left_border, dist_right_border);
-  const unsigned long long int init_star6_threshold = probability_wrapper.calc_init_star6_threshold(dist_left_border, dist_right_border);
+  const unsigned long long int init_target_star6_threshold =
+      probability_wrapper.calc_init_target_star6_threshold(dist_left_border,
+                                                           dist_right_border);
+  const unsigned long long int init_star6_threshold =
+      probability_wrapper.calc_init_star6_threshold(dist_left_border,
+                                                    dist_right_border);
+
   unsigned long long int target_star6_threshold = init_target_star6_threshold;
   unsigned long long int star6_threshold = init_star6_threshold;
 
-  // The amount of change each time for the thresholds when pity system comes into effect
-  unsigned int delta_star6_threshold = probability_wrapper.calc_star6_threshold_change_step(dist_left_border, dist_right_border);
-  unsigned int delta_target_star6_threshold = probability_wrapper.calc_target_star6_threshold_change_step(dist_left_border, dist_right_border);
+  // The amount of change each time for the thresholds when pity system comes
+  // into effect
+  unsigned int delta_star6_threshold =
+      probability_wrapper.calc_star6_threshold_change_step(dist_left_border,
+                                                           dist_right_border);
+  unsigned int delta_target_star6_threshold =
+      probability_wrapper.calc_target_star6_threshold_change_step(
+          dist_left_border, dist_right_border);
 
-  // Using a vector as a simple hash map to record the results.
-  // Indexes as the times of pulling, values as the times as this event happens
-  // Will record at most 1000 times continuously pulls (, which will cost you a
-  // lot...)
-  // If you are curiouse about the probability of continuously pulling more times
-  // and get the target star 6 operator at the last time pull (prepare enough money, haha),
-  // then you can increase this number, but this will suffer more from the errors of
-  // generated random numbers
   std::vector<unsigned long long int> result(1000);
 
   // Record the event that did not get a star 6 operator
   // untill pulling more than 1000 times
   std::unordered_map<unsigned long long int, unsigned long long int> rare_event;
 
-  // To avoid the rare_event map recording too many items and consuming too 
-  // large memory. You need to simulate approximately 10^13 times of pulling
-  // to reach this limit.
-  const size_t max_rare_event_map_size = 100000;
+  // To avoid the rare_event map recording too many items and consuming too
+  // large memory.
+  const size_t max_rare_event_map_size = 100000;  // You need to simulate
+                                                  // approximately 10^13 times
+                                                  // of pulling to reach this
+                                                  // limit.
 
   std::cout << "Now will start the simulation...\n" << std::endl;
 
