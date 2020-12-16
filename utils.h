@@ -72,7 +72,7 @@ void display_help_message() {
   std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
                "The order of these arguments does not matter\n\n"
                "--help : Display the help message\n"
-               "--t|--total-pull-time : Set the time of pulling in a simulation\n"
+               "-t|--total-pull-time : Set the time of pulling in a simulation\n"
                "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux 64bit/C++11\n"
                "                        Note : This is not the experiment time\n"
                "                        Note : If you provide a number greather than 18446744073709551615, the\n"
