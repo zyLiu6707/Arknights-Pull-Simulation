@@ -195,13 +195,13 @@ bool process_cmd_input_and_set_corres_var(
     unsigned int& pity_starting_point) {
   const int expected_max_arg_num = 8;
   if (argc > expected_max_arg_num) {
-    std::cerr << "Too many arguments!" << std::endl;
+    std::cerr << "\nToo many arguments!\n" << std::endl;
     display_help_message();
     return false;
   }
   if (argc == 1) {
-    display_help_message();
-    return false;
+    std::cerr << "\nNote: No arguments are provided. Will simulate a double-rate-up limited banner.\n" << std::endl;
+    return true;
   }
 
   // Control arguments are those that can specify the behavior of the

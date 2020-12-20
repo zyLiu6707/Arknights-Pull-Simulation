@@ -8,7 +8,7 @@ valgrind_flag = "--leak-check=full --show-leak-kinds=all"
 valgrind_keywords = "All heap blocks were freed -- no leaks are possible"
 
 # test cases: a list of ["./executable args", "expect_values"]
-test_case = [["./cmd_parse_unitest", "0"]
+test_case = [["./cmd_parse_unitest", "1"]
     , ["./cmd_parse_unitest --help", "0"]
 
     # Test cases for -t, --total-pull-time
