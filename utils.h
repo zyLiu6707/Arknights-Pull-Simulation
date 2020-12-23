@@ -70,7 +70,6 @@ uint_fast64_t get_random_seed() {
 // Display the help message
 void display_help_message() {
   std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
-               "The order of these arguments does not matter\n\n"
                "--help : Display the help message\n"
                "-t|--total-pull-time : Set the time of pulling in a simulation\n"
                "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux 64bit/C++11\n"
@@ -87,7 +86,8 @@ void display_help_message() {
                "                        Note: If you provide a number greater than 4294967295, the program will run the\n"
                "                              simulation with maximum valid value for pity starting time (i.e., 4294967295)\n"
                "     -n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"
-               "                        The valid values are 1 and 2"
+               "                        The valid values are 1 and 2\n"
+               "Note that the order of these arguments does not matter.\n"
                << std::endl;
 
   return;
