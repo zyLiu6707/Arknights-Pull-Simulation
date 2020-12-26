@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
 
   // To avoid the rare_event map recording too many items and consuming too
   // large memory.
-  const size_t max_rare_event_map_size = 100000;  // You need to simulate
+  const size_t max_rare_event_map_size = 100000;  // you need to simulate
                                                   // approximately 10^13 times
                                                   // of pulling to reach this
                                                   // limit.

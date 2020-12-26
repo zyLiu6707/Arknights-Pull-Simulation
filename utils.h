@@ -4,7 +4,8 @@
 #include <assert.h>
 #include <time.h>
 
-#include <cctype>  // isdigit
+#include <algorithm>  // min
+#include <cctype>     // isdigit
 #include <iostream>
 #include <random>
 #include <unordered_map>
@@ -18,10 +19,12 @@ const double limited_banner_on_banner_star6_conditional_rate = 0.7;
 const double regular_banner_on_banner_star6_conditional_rate = 0.5;
 
 // Pre-defined parameters for displaying the results
-// maximum number of raw data to show
+// Maximum number of raw data to show
 const size_t raw_data_showing_limit = 100;
-// maximum number of rare event to show
+// Maximum number of rare event to show
 const size_t rare_event_showing_limit = 10;
+// Maximum number of estimated probability to show
+const size_t estimated_prob_showing_limit = 1000;
 
 /* For debugging purpose */
 // Print the content in arg_map
@@ -517,15 +520,21 @@ void display_simulation_results(
     unsigned long long int star6_count,
     unsigned long long int target_star6_count, unsigned int seed,
     const struct timespec& start, const struct timespec& end) {
+  std::cout << "...finished\n" << std::endl;
+
   // Simulation summary
+  std::cout << "SIMULATION SUMMARY" << std::endl;
+  std::cout << "-------------------------" << std::endl;
   std::cout << "Time spent: " << calc_time(start, end) << "s" << std::endl;
   std::cout << "Random seed for this simulation: " << seed << std::endl;
   std::cout << "Star 6 times: " << star6_count << std::endl;
   std::cout << "Target star 6 times: " << target_star6_count << std::endl;
 
-  std::cout << "-------------------------" << std::endl;
+  std::cout << std::endl;
 
   // Displaying raw data
+  std::cout << "RAW DATA" << std::endl;
+  std::cout << "-------------------------" << std::endl;
   std::cout << "First " << raw_data_showing_limit << " raw data:" << std::endl;
   std::cout << "\t";
   for (unsigned int i = 0; i < 10; ++i) {
@@ -541,12 +550,17 @@ void display_simulation_results(
       std::cout << std::endl;
     }
   }
+  // If raw_data_showing_limit is not a multiple of 10, print an extra new line
   std::cout << std::endl;
   if (raw_data_showing_limit % 10 != 0) {
     std::cout << std::endl;
   }
 
+  std::cout << std::endl;
+
   // Displaying rare events
+  std::cout << "RARE EVENTS" << std::endl;
+  std::cout << "-------------------------" << std::endl;
   std::cout << "Rare events happend " << rare_event.size() << " times in total"
             << std::endl;
   if (rare_event.size() != 0 && rare_event_showing_limit > 0) {
@@ -563,27 +577,44 @@ void display_simulation_results(
         counter++;
       }
     }
+    std::cout << std::endl;
+    std::cout << "Note: Since the rare events are very sensitive to the error of the actual distribution\n"
+                 "      of generated random numbers (i.e., we want a perfect uniform distribution, but\n"
+                 "      there would be error under limited times of random number generating), the\n"
+                 "      estimated probabilities for these rare events will not be accurate.\n"
+                 "      Hence will not show the estimated probabilities of those rare events."
+              << std::endl;
   }
 
   std::cout << std::endl;
-  std::cout << "Note: Since the rare events are very sensitive to the error of the actual distribution\n"
-               "      of generated random numbers (i.e., we want a perfect uniform distribution, but\n"
-               "      there would be error under limited times of random number generating), the\n"
-               "      estimated probabilities for these rare events will not be accurate.\n"
-               "      Hence will not show the estimated probabilities of those rare events."
-            << std::endl;
-
-  std::cout << "-------------------------" << std::endl;
 
   // Displaying the estimated probability
-  std::cout << "The estimated probabilities are (skip all non-happend events): "
-            << std::endl;
-  for (unsigned int i = 1; i < result.size(); ++i) {  // skip the unused index 0
+  // that you succeed *on* N-th pull
+  std::cout << "ESTIMATED PROBABILITY" << std::endl;
+  std::cout << "-------------------------" << std::endl;
+  for (unsigned int i = 1; i < std::min(estimated_prob_showing_limit, result.size());
+       ++i) {  // skip the unused index 0
     if (result[i] != 0) {
-      std::cout << "Pr(Pulling " << i << " times to succeed) = "
-                << (100.0 * result[i]) / target_star6_count << " %"
+      std::cout << "Pr(S_" << i
+                << ") = " << (100.0 * result[i]) / target_star6_count << " %"
                 << std::endl;
     }
+  }
+  std::cout << "Non-happend events are skipped" << std::endl;
+
+  std::cout << std::endl;
+
+  // Displaying the cumulated probability
+  // Here "cumulated" means that you succeed *within* N pulls
+  double cumulated_probability = 0.0;
+  std::cout << "CUMULATED PROBABILITY" << std::endl;
+  std::cout << "-------------------------" << std::endl;
+  for (unsigned int i = 1; i < std::min(estimated_prob_showing_limit, result.size());
+       ++i) {
+    cumulated_probability += result[i];
+    std::cout << "Pr(W_" << i << ") = "
+              << (100.0 * cumulated_probability) / target_star6_count << " %"
+              << std::endl;
   }
 }
 
