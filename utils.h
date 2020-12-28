@@ -592,15 +592,14 @@ void display_simulation_results(
   // that you succeed *on* N-th pull
   std::cout << "ESTIMATED PROBABILITY" << std::endl;
   std::cout << "-------------------------" << std::endl;
-  for (unsigned int i = 1; i < std::min(estimated_prob_showing_limit, result.size());
+  for (unsigned int i = 1;
+       i < std::min(estimated_prob_showing_limit, result.size());
        ++i) {  // skip the unused index 0
-    if (result[i] != 0) {
-      std::cout << "Pr(S_" << i
-                << ") = " << (100.0 * result[i]) / target_star6_count << " %"
-                << std::endl;
-    }
+
+    std::cout << "Pr(S_" << i
+              << ") = " << (100.0 * result[i]) / target_star6_count << " %"
+              << std::endl;
   }
-  std::cout << "Non-happend events are skipped" << std::endl;
 
   std::cout << std::endl;
 
@@ -609,12 +608,12 @@ void display_simulation_results(
   double cumulated_probability = 0.0;
   std::cout << "CUMULATED PROBABILITY" << std::endl;
   std::cout << "-------------------------" << std::endl;
-  for (unsigned int i = 1; i < std::min(estimated_prob_showing_limit, result.size());
-       ++i) {
+  for (unsigned int i = 1;
+       i < std::min(estimated_prob_showing_limit, result.size()); ++i) {
     cumulated_probability += result[i];
-    std::cout << "Pr(W_" << i << ") = "
-              << (100.0 * cumulated_probability) / target_star6_count << " %"
-              << std::endl;
+    std::cout << "Pr(W_" << i
+              << ") = " << (100.0 * cumulated_probability) / target_star6_count
+              << " %" << std::endl;
   }
 }
 
