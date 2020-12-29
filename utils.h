@@ -16,7 +16,7 @@
 
 // Pre-defined parameters for Arknights
 const double limited_banner_on_banner_star6_conditional_rate = 0.7;
-const double regular_banner_on_banner_star6_conditional_rate = 0.5;
+const double standard_banner_on_banner_star6_conditional_rate = 0.5;
 
 // Pre-defined parameters for displaying the results
 // Maximum number of raw data to show
@@ -72,17 +72,17 @@ uint_fast64_t get_random_seed() {
 
 // Display the help message
 void display_help_message() {
-  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--regular|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
+  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--standard|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
                "--help : Display the help message\n"
                "-t|--total-pull-time : Set the time of pulling in a simulation\n"
                "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux 64bit/C++11\n"
                "                        Note : This is not the experiment time\n"
                "                        Note : If you provide a number greather than 18446744073709551615, the\n"
                "                               program will run the simulation with maximum valid times (i.e., 18446744073709551615)\n"
-               "            --regular : Simulation and get the estimated probability in a regular banner\n"
+               "            --standard : Simulation and get the estimated probability in a standard banner\n"
                "                        Cannot be specified with --limited at the same time\n"
                "            --limited : Simulation and get the estimated probability in a limited banner\n"
-               "                        Cannot be specified with --regular at the same time\n"
+               "                        Cannot be specified with --standard at the same time\n"
                "               --pity : Set the starting point where the pity system comes into effect,\n"
                "                        i.e., you will get a higher probability on the specified pull's next pull\n"
                "                        Valid value is an integer between [0, 4294967295] on Linux 64bit/C+11\n"
@@ -132,7 +132,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
     }
     // Conflict arguments
     if (error_flag.err_conflict_ctrl_arg_flag) {
-      std::cerr << "\tConflict arguments: \"--regular\" and \"--limited\" are specified at the same time\n";
+      std::cerr << "\tConflict arguments: \"--standard\" and \"--limited\" are specified at the same time\n";
     }
     // Missing detail value
     if (error_flag.err_missing_value_for_total_pull_time_ctrl_arg) {
@@ -173,8 +173,8 @@ void display_error_detail(const ErrorFlag& error_flag) {
       std::cerr << "\tInvalid value for \"--num-rate-up\" - it must be a 1 or 2\n";
     }
     // Unexpected value
-    if (error_flag.err_unexpected_value_for_ctrl_arg_regular) {
-      std::cerr << "\tUnexpected value for \"--regular\"\n";
+    if (error_flag.err_unexpected_value_for_ctrl_arg_standard) {
+      std::cerr << "\tUnexpected value for \"--standard\"\n";
     }
     if (error_flag.err_unexpected_value_for_ctrl_arg_limited) {
       std::cerr << "\tUnexpected value for \"--limited\"\n";
@@ -208,10 +208,10 @@ bool process_cmd_input_and_set_corres_var(
   }
 
   // Control arguments are those that can specify the behavior of the
-  // program, i.e., display help message, simulate a regular banner or
+  // program, i.e., display help message, simulate a standard banner or
   // a limited banner, etc. Starts with at lease one dash '-'
   std::unordered_set<std::string> expected_control_arg(
-      {"--help", "-t", "--total-pull-time", "--limited", "--regular", "-p",
+      {"--help", "-t", "--total-pull-time", "--limited", "--standard", "-p",
        "--pity", "-n", "--num-rate-up"});
 
   // Store control argument as arg_map's key, and ctrl arg's value as arg_map's
@@ -300,8 +300,8 @@ bool process_cmd_input_and_set_corres_var(
   }
 
   // Check whether conflict control arguments are provided,
-  // i.e., --regular and --limited are both provided
-  if (arg_map.find("--regular") != arg_map.end() &&
+  // i.e., --standard and --limited are both provided
+  if (arg_map.find("--standard") != arg_map.end() &&
       arg_map.find("--limited") != arg_map.end()) {
     error_flag.err_conflict_ctrl_arg_flag = true;
   }
@@ -438,9 +438,9 @@ bool process_cmd_input_and_set_corres_var(
   }
 
   // Check whether there is unexpected values for the control
-  // arguments --regular and --limited
-  if (arg_map.count("--regular") == 1 && arg_map["--regular"].size() != 0) {
-    error_flag.err_unexpected_value_for_ctrl_arg_regular = true;
+  // arguments --standard and --limited
+  if (arg_map.count("--standard") == 1 && arg_map["--standard"].size() != 0) {
+    error_flag.err_unexpected_value_for_ctrl_arg_standard = true;
   }
   if (arg_map.count("--limited") == 1 && arg_map["--limited"].size() != 0) {
     error_flag.err_unexpected_value_for_ctrl_arg_limited = true;
@@ -450,9 +450,9 @@ bool process_cmd_input_and_set_corres_var(
 
   // Command line input is valid, now set the fields ProbabilityWrapper
   if (!error_flag.check_err()) {
-    if (arg_map.find("--regular") != arg_map.end()) {
+    if (arg_map.find("--standard") != arg_map.end()) {
       probability_wrapper.set_on_banner_star6_conditional_rate(
-          regular_banner_on_banner_star6_conditional_rate);
+          standard_banner_on_banner_star6_conditional_rate);
     } else if (arg_map.find("--limited") != arg_map.end()) {
       probability_wrapper.set_on_banner_star6_conditional_rate(
           limited_banner_on_banner_star6_conditional_rate);
@@ -502,9 +502,9 @@ void display_simulation_settings(const ProbabilityWrapper& probability_wrapper,
               << limited_banner_on_banner_star6_conditional_rate * 100
               << " %\n";
   } else if (probability_wrapper.get_on_banner_star6_conditional_rate() ==
-             regular_banner_on_banner_star6_conditional_rate) {
-    std::cout << "\tBanner Type: Regular Banner, the conditional rate is "
-              << regular_banner_on_banner_star6_conditional_rate * 100
+             standard_banner_on_banner_star6_conditional_rate) {
+    std::cout << "\tBanner Type: Standard Banner, the conditional rate is "
+              << standard_banner_on_banner_star6_conditional_rate * 100
               << " %\n";
   }
   std::cout << "\tRate-Up Operator(s): "

@@ -29,7 +29,7 @@ class ErrorFlag {
 
   bool err_conflict_ctrl_arg_flag;
   bool err_unexpected_value_for_ctrl_arg_limited;
-  bool err_unexpected_value_for_ctrl_arg_regular;
+  bool err_unexpected_value_for_ctrl_arg_standard;
   bool err_unexpected_arguments_at_the_beginning;
   bool err_help_ctrl_arg_with_other_args;
   bool err_invalid_ctrl_args;
@@ -59,7 +59,7 @@ class ErrorFlag {
 
         err_conflict_ctrl_arg_flag(false),
         err_unexpected_value_for_ctrl_arg_limited(false),
-        err_unexpected_value_for_ctrl_arg_regular(false),
+        err_unexpected_value_for_ctrl_arg_standard(false),
         err_unexpected_arguments_at_the_beginning(false),
         err_help_ctrl_arg_with_other_args(false),
         err_invalid_ctrl_args(false) {}
@@ -88,7 +88,7 @@ class ErrorFlag {
 
            err_conflict_ctrl_arg_flag ||
            err_unexpected_value_for_ctrl_arg_limited ||
-           err_unexpected_value_for_ctrl_arg_regular ||
+           err_unexpected_value_for_ctrl_arg_standard ||
            err_unexpected_arguments_at_the_beginning ||
            err_help_ctrl_arg_with_other_args ||
            err_invalid_ctrl_args;
