@@ -8,8 +8,8 @@ int main(int argc, char* argv[]) {
   // 3. Double rate up
   ProbabilityWrapper probability_wrapper(0.02, 0.7, 0.02, 2);
 
-  // In arknights, the pity system will comes into effect on the 51th pull
-  // if you did not get any star6 operator in the past 50 pulls
+  // In Arknights, the pity system will come into effect after 50 pulls
+  // if you did not get any star6 operator
   unsigned int pity_starting_point = 50;
 
   unsigned long long int total_pull_time = 100000000;
@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
       argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
   if (!can_continue) {
     // Exit the program here rather than exiting when argument format error is
-    // found to avoid memory leak
+    // found in order to avoid memory leak
     return 0;
   }
 
@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
   // Count the times of countinuously getting a non-star-6 operator
   unsigned long long int pity_count = 0;
   // Count the times of pulling. Will be reset to 0 when get the target star 6
-  // operator Theoretically, no matter how many bits used to store the value of
+  // operator. Theoretically, no matter how many bits used to store the value of
   // current_pull_count, there exists a non-zero probability that it
   // will overflow - but the probability will converge to zero when
   // num of bits grows to positive infinity
@@ -59,8 +59,8 @@ int main(int argc, char* argv[]) {
   unsigned long long int target_star6_threshold = init_target_star6_threshold;
   unsigned long long int star6_threshold = init_star6_threshold;
 
-  // The amount of change each time for the thresholds when pity system comes
-  // into effect
+  // The amount that the thresholds change after each failed pull when pity
+  // system comes into effect
   unsigned int delta_star6_threshold =
       probability_wrapper.calc_star6_threshold_change_step(dist_left_border,
                                                            dist_right_border);
