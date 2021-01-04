@@ -10,4 +10,4 @@ Run `make clean` to remove all `*.o`s and the executable files.
 
 Simulation results are under `res/`. High resolution line charts and other images are under `img/`. Some test cases and testing python scripts that I used during my development are under `test/`, which you don't need to worry about.
 
-#### Please be sure to refer to [the full documentation](https://rpubs.com/zyLiu6707/arknights-pull-simulation) on RPubs, where LaTeX is naturally supported, for the detail about how to use this repo, the discussion about the mathematical model behind this mobile game and the explanation of simulation results.
+### Please be sure to refer to [the full documentation](https://rpubs.com/zyLiu6707/arknights-pull-simulation) on RPubs, where LaTeX is naturally supported, for the detail about how to use this repo, the discussion about the mathematical model behind this mobile game and the explanation of simulation results.
