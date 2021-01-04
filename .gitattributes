@@ -1,0 +1,4 @@
+# Not let the GitHub linguist detect 
+# png images and simulation result files
+*.res linguist-detectable=false
+*.png linguist-detectable=false
