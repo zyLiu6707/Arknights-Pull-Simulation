@@ -13,9 +13,10 @@ int main(int argc, char* argv[]) {
   unsigned int pity_starting_point = 50;
 
   unsigned long long int total_pull_time = 100000000;
+  unsigned int init_pity_count = 0;
 
   bool can_continue = process_cmd_input_and_set_corres_var(
-      argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
+      argc, argv, probability_wrapper, total_pull_time, pity_starting_point, init_pity_count);
   if (!can_continue) {
     // Exit the program here rather than exiting when argument format error is
     // found in order to avoid memory leak
@@ -91,24 +92,28 @@ int main(int argc, char* argv[]) {
   // Start simulation
   for (unsigned long long int i = 0; i < total_pull_time; ++i) {
     unsigned int rand_num = dist(mt);
-    current_pull_count++;  // Leave the index 0 of result vector unused
+    current_pull_count++;  // leave the index 0 of result vector unused
     // Get a star-6 operator
     if (rand_num < star6_threshold) {
       star6_count++;
+      pity_count = 0;
       // This star-6 operator is also your target operator
       if (rand_num < target_star6_threshold) {
         target_star6_count++;
         if (current_pull_count < result.size()) {
           result[current_pull_count]++;
-        } else if (rare_event.size() < max_rare_event_map_size) {
+        }
+        else if (rare_event.size() < max_rare_event_map_size) {
           rare_event[current_pull_count]++;
         }
         current_pull_count = 0;
+        // Finish currrent trial, reset the pity counter and start next trial
+        pity_count = init_pity_count;
       }
-      pity_count = 0;
       star6_threshold = init_star6_threshold;
       target_star6_threshold = init_target_star6_threshold;
-    } else {
+    }
+    else {
       pity_count++;
       if (pity_count > pity_starting_point) {
         star6_threshold += delta_star6_threshold;

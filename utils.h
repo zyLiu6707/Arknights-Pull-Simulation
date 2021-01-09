@@ -195,7 +195,7 @@ void display_error_detail(const ErrorFlag& error_flag) {
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
     unsigned long long int& total_pull_time,
-    unsigned int& pity_starting_point) {
+    unsigned int& pity_starting_point, unsigned int init_pity_count) {
   const int expected_max_arg_num = 8;
   if (argc > expected_max_arg_num) {
     std::cerr << "\nToo many arguments!\n" << std::endl;
