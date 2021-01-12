@@ -13,10 +13,10 @@ int main(int argc, char* argv[]) {
   unsigned int pity_starting_point = 50;
 
   unsigned long long int total_pull_time = 100000000;
-  unsigned int init_pity_count = 0;
+  unsigned long long int current_pull = 0;
 
   bool can_continue = process_cmd_input_and_set_corres_var(
-      argc, argv, probability_wrapper, total_pull_time, pity_starting_point, init_pity_count);
+      argc, argv, probability_wrapper, total_pull_time, pity_starting_point, current_pull);
   if (!can_continue) {
     // Exit the program here rather than exiting when argument format error is
     // found in order to avoid memory leak
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
   }
 
   display_simulation_settings(probability_wrapper, total_pull_time,
-                              pity_starting_point);
+                              pity_starting_point, current_pull);
 
   auto seed = get_random_seed();
   std::mt19937_64 mt(seed);
@@ -41,11 +41,11 @@ int main(int argc, char* argv[]) {
   unsigned long long int target_star6_count = 0;
   // Count the times of countinuously getting a non-star-6 operator
   unsigned long long int pity_count = 0;
-  // Count the times of pulling. Will be reset to 0 when get the target star 6
-  // operator. Theoretically, no matter how many bits used to store the value of
-  // current_pull_count, there exists a non-zero probability that it
-  // will overflow - but the probability will converge to zero when
-  // num of bits grows to positive infinity
+  // Count the times of pulling in a trial. Will be reset to 0 when get the
+  // target star 6 operator. Theoretically, no matter how many bits used to
+  // store the value of current_pull_count, there exists a non-zero probability
+  // that it will overflow - but the probability will converge to zero when num
+  // of bits grows to positive infinity
   unsigned long long int current_pull_count = 0;
 
   // The thresholds will be used to decide whether we got a star6/target star6
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
         }
         current_pull_count = 0;
         // Finish currrent trial, reset the pity counter and start next trial
-        pity_count = init_pity_count;
+        pity_count = current_pull;
       }
       star6_threshold = init_star6_threshold;
       target_star6_threshold = init_target_star6_threshold;
