@@ -92,6 +92,21 @@ test_case = [
 , ["./cmd_parse_unitest -p 4294967294 -c -4294967343", "0"]
 , ["./cmd_parse_unitest -p 4294967294 -c -4294967344", "0"]
 
+, ["./cmd_parse_unitest --pity 4294967295 --current-pull 4294967343", "1"]
+, ["./cmd_parse_unitest --pity 4294967295 --current-pull 4294967344", "0"]
+, ["./cmd_parse_unitest --pity 4294967296 --current-pull 4294967343", "1"]
+, ["./cmd_parse_unitest --pity 4294967296 --current-pull 4294967344", "1"]
+, ["./cmd_parse_unitest --pity 4294967294 --current-pull 4294967342", "1"]
+, ["./cmd_parse_unitest --pity 4294967294 --current-pull 4294967343", "0"]
+, ["./cmd_parse_unitest --pity 4294967294 --current-pull 4294967344", "0"]
+, ["./cmd_parse_unitest --pity 4294967295 --current-pull -4294967343", "0"]
+, ["./cmd_parse_unitest --pity 4294967295 --current-pull -4294967344", "0"]
+, ["./cmd_parse_unitest --pity 4294967296 --current-pull -4294967343", "0"]
+, ["./cmd_parse_unitest --pity 4294967296 --current-pull -4294967344", "0"]
+, ["./cmd_parse_unitest --pity 4294967294 --current-pull -4294967342", "0"]
+, ["./cmd_parse_unitest --pity 4294967294 --current-pull -4294967343", "0"]
+, ["./cmd_parse_unitest --pity 4294967294 --current-pull -4294967344", "0"]
+
 , ["./cmd_parse_unitest -p 4294967294 -c 18446744073709551615", "0"]
 , ["./cmd_parse_unitest -p 4294967294 -c -18446744073709551615", "0"]
 
