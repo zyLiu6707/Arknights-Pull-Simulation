@@ -5,7 +5,7 @@ int main(int argc, char* argv[]) {
 
   ProbabilityWrapper dbg_pw(-1.0, -1.0, -1.0, 0);
   unsigned long long int dbg_total_pull_time = 0;
-  unsigned int dbg_pity_starting_point = 0;
+  unsigned int dbg_pity_starting_point = 50;
   unsigned long long int dbg_current_pull = 0;
   std::cout << "argc = " << argc << std::endl;
   std::cout << "Initially:\n"
