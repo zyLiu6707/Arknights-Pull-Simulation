@@ -22,7 +22,7 @@ const double standard_banner_on_banner_star6_conditional_rate = 0.5;
 //      ~~~~~~~~~~~~~^     ^   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //      100% chance of    base rate            amount of increased rate
 //     getting a star6    of getting star6     after a failed pull
-const unsigned int steps_to_guaranteed_star6 = 49;
+const unsigned long long int steps_to_guaranteed_star6 = 49;
 
 const unsigned long int max_pity_starting_point =
     4294967295;  // DO NOT USE ULONG_MAX - it can be (2^64 - 1) on some platform
