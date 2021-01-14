@@ -24,6 +24,9 @@ const double standard_banner_on_banner_star6_conditional_rate = 0.5;
 //     getting a star6    of getting star6     after a failed pull
 const unsigned int steps_to_guaranteed_star6 = 49;
 
+const unsigned long int max_pity_starting_point =
+    4294967295;  // DO NOT USE ULONG_MAX - it can be (2^64 - 1) on some platform
+
 // Pre-defined parameters for displaying the results
 // Maximum number of raw data to show
 const size_t raw_data_showing_limit = 100;
@@ -429,6 +432,10 @@ bool process_cmd_input_and_set_corres_var(
           pity_starting_temp_compare < 0) {
         error_flag.err_invalid_value_for_pity_ctrl_arg = true;
       }
+      // Shrink the big value to atmost 2^32 - 1
+      pity_starting_temp = (pity_starting_temp <= max_pity_starting_point)
+                                ? pity_starting_temp
+                                : max_pity_starting_point;
     }
   }
   if (iter_pity_long_name != arg_map.cend()) {
@@ -445,6 +452,10 @@ bool process_cmd_input_and_set_corres_var(
           pity_starting_temp_compare < 0) {
         error_flag.err_invalid_value_for_pity_long_name_ctrl_arg = true;
       }
+      // Shrink the big value to atmost 2^32 - 1
+      pity_starting_temp = (pity_starting_temp <= max_pity_starting_point)
+                                ? pity_starting_temp
+                                : max_pity_starting_point;
     }
   }
 
