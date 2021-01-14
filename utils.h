@@ -17,15 +17,6 @@
 // Pre-defined parameters for Arknights
 const double limited_banner_on_banner_star6_conditional_rate = 0.7;
 const double standard_banner_on_banner_star6_conditional_rate = 0.5;
-// Numbers of pulls that you are guaranteed to get a star6 operator
-// it is equals to (100% - 2%)/2%
-//      ~~~~~~~~~~~~~^     ^   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//      100% chance of    base rate            amount of increased rate
-//     getting a star6    of getting star6     after a failed pull
-const unsigned long long int steps_to_guaranteed_star6 = 49;
-
-const unsigned long long int max_pity_starting_point =
-    4294967295;  // DO NOT USE ULONG_MAX - it can be (2^64 - 1) on some platform
 
 // Pre-defined parameters for displaying the results
 // Maximum number of raw data to show
@@ -99,8 +90,6 @@ void display_help_message() {
                "                              simulation with maximum valid value for pity starting time (i.e., 4294967295)\n"
                "     -n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"
                "                        The valid values are 1 and 2\n"
-               "    -c|--current-pull : Set how many times that you have already pulled\n"
-               "                        Valid value is an integer between [0, <-p|--pity value> + 49) (inclusive, exclusive)\n"
                "Note that the order of these arguments does not matter.\n"
                << std::endl;
 
@@ -141,9 +130,6 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_redundant_num_rate_up_ctrl_arg) {
       std::cerr << "\tRedundant arguments: \"-n\" and \"--num-rate-up\" are specified at the same time\n";
     }
-    if (error_flag.err_redundant_current_pull_ctrl_arg) {
-      std::cerr << "\tRedundant arguments: \"-c\" and \"--current-pull\" are specified at the same time\n";
-    }
     // Conflict arguments
     if (error_flag.err_conflict_ctrl_arg_flag) {
       std::cerr << "\tConflict arguments: \"--standard\" and \"--limited\" are specified at the same time\n";
@@ -167,12 +153,6 @@ void display_error_detail(const ErrorFlag& error_flag) {
     if (error_flag.err_missing_value_for_num_rate_up_long_name_ctrl_arg) {
       std::cerr << "\tMissing value for \"--num-rate-up\"\n";
     }
-    if (error_flag.err_missing_value_for_current_pull_ctrl_arg) {
-      std::cerr << "\tMissing value for \"-c\"\n";
-    }
-    if (error_flag.err_missing_value_for_current_pull_long_name_ctrl_arg) {
-      std::cerr << "\tMissing value for \"--current-pull\"\n";
-    }
     // Invalid value
     if (error_flag.err_invalid_value_for_total_pull_time_ctrl_arg) {
       std::cerr << "\tInvalid value for \"-t\" - it must be a positive integer\n";
@@ -191,12 +171,6 @@ void display_error_detail(const ErrorFlag& error_flag) {
     }
     if (error_flag.err_invalid_value_for_num_rate_up_long_name_ctrl_arg) {
       std::cerr << "\tInvalid value for \"--num-rate-up\" - it must be a 1 or 2\n";
-    }
-    if (error_flag.err_invalid_value_for_current_pull_ctrl_arg) {
-      std::cerr << "\tInvalid value for \"-c\" - it must be an integer between [0, <-p|--pity value> + 49) (inclusive, exclusive)\n";
-    }
-    if (error_flag.err_invalid_value_for_current_pull_long_name_ctrl_arg) {
-      std::cerr << "\tInvalid value for \"--current-pull\" - it must be an integer between [0, <-p|--pity value> + 49) (inclusive, exclusive)\n";
     }
     // Unexpected value
     if (error_flag.err_unexpected_value_for_ctrl_arg_standard) {
@@ -221,8 +195,8 @@ void display_error_detail(const ErrorFlag& error_flag) {
 bool process_cmd_input_and_set_corres_var(
     int argc, char* argv[], ProbabilityWrapper& probability_wrapper,
     unsigned long long int& total_pull_time,
-    unsigned int& pity_starting_point, unsigned long long int& current_pull) {
-  const int expected_max_arg_num = 10;
+    unsigned int& pity_starting_point) {
+  const int expected_max_arg_num = 8;
   if (argc > expected_max_arg_num) {
     std::cerr << "\nToo many arguments!\n" << std::endl;
     display_help_message();
@@ -238,7 +212,7 @@ bool process_cmd_input_and_set_corres_var(
   // a limited banner, etc. Starts with at lease one dash '-'
   std::unordered_set<std::string> expected_control_arg(
       {"--help", "-t", "--total-pull-time", "--limited", "--standard", "-p",
-       "--pity", "-n", "--num-rate-up", "-c", "--current-pull"});
+       "--pity", "-n", "--num-rate-up"});
 
   // Store control argument as arg_map's key, and ctrl arg's value as arg_map's
   // value. 
@@ -299,8 +273,6 @@ bool process_cmd_input_and_set_corres_var(
   const auto iter_pity_long_name = arg_map.find("--pity");
   const auto iter_num_rate_up = arg_map.find("-n");
   const auto iter_num_rate_up_long_name = arg_map.find("--num-rate-up");
-  const auto iter_current_pull = arg_map.find("-c");
-  const auto iter_current_pull_long_name = arg_map.find("--current-pull");
 
   // Check whether the first argument (i.e., argv[1]) is an unexpected arg
   if (argv[1][0] != '-' || isdigit(argv[1][1])) {
@@ -326,10 +298,6 @@ bool process_cmd_input_and_set_corres_var(
       iter_num_rate_up_long_name != arg_map.end()) {
     error_flag.err_redundant_num_rate_up_ctrl_arg = true;
   }
-  if (iter_current_pull != arg_map.end() &&
-      iter_current_pull_long_name != arg_map.end()) {
-    error_flag.err_redundant_current_pull_ctrl_arg = true;
-  }
 
   // Check whether conflict control arguments are provided,
   // i.e., --standard and --limited are both provided
@@ -339,7 +307,7 @@ bool process_cmd_input_and_set_corres_var(
   }
 
   // Check whether missing a specific value for control arguments that expect one,
-  // i.e., -t/--total-pull-time, -p/--pity, -n/--num-rate-up and -c/--current-pull
+  // i.e., -t/--total-pull-time, -p/--pity and -n/--num-rate-up
   if (iter_total_pull_time != arg_map.cend() &&
       iter_total_pull_time->second.size() == 0) {
     error_flag.err_missing_value_for_total_pull_time_ctrl_arg = true;
@@ -361,14 +329,6 @@ bool process_cmd_input_and_set_corres_var(
   } else if (iter_num_rate_up_long_name != arg_map.cend() &&
              iter_num_rate_up_long_name->second.size() == 0) {
     error_flag.err_missing_value_for_num_rate_up_long_name_ctrl_arg = true;
-  }
-
-  if (iter_current_pull != arg_map.cend() &&
-      iter_current_pull->second.size() == 0) {
-    error_flag.err_missing_value_for_current_pull_ctrl_arg = true;
-  } else if (iter_current_pull_long_name != arg_map.cend() &&
-             iter_current_pull_long_name->second.size() == 0) {
-    error_flag.err_missing_value_for_current_pull_long_name_ctrl_arg = true;
   }
 
   // Check the format of specific value for control arguments that expect one.
@@ -417,25 +377,21 @@ bool process_cmd_input_and_set_corres_var(
     }
   }
 
-  unsigned long long int pity_starting_temp = 50;
-  long long int pity_starting_temp_compare = 50;
+  unsigned long int pity_starting_temp = 0;
+  long int pity_starting_temp_compare = 0;
   if (iter_pity != arg_map.cend()) {
     if (iter_pity->second.size() > 1) {
       error_flag.err_invalid_value_for_pity_ctrl_arg = true;
     } else if (iter_pity->second.size() > 0) {
       char* p_end = nullptr;
       char* p_end_compare = nullptr;
-      pity_starting_temp = strtoull(iter_pity->second[0].c_str(), &p_end, 10);
+      pity_starting_temp = strtoul(iter_pity->second[0].c_str(), &p_end, 10);
       pity_starting_temp_compare =
-          strtoll(iter_pity->second[0].c_str(), &p_end_compare, 10);
+          strtol(iter_pity->second[0].c_str(), &p_end_compare, 10);
       if (*p_end != '\0' || *p_end_compare != '\0' ||
           pity_starting_temp_compare < 0) {
         error_flag.err_invalid_value_for_pity_ctrl_arg = true;
       }
-      // Shrink the big value to atmost 2^32 - 1
-      pity_starting_temp = (pity_starting_temp <= max_pity_starting_point)
-                                ? pity_starting_temp
-                                : max_pity_starting_point;
     }
   }
   if (iter_pity_long_name != arg_map.cend()) {
@@ -452,10 +408,6 @@ bool process_cmd_input_and_set_corres_var(
           pity_starting_temp_compare < 0) {
         error_flag.err_invalid_value_for_pity_long_name_ctrl_arg = true;
       }
-      // Shrink the big value to atmost 2^32 - 1
-      pity_starting_temp = (pity_starting_temp <= max_pity_starting_point)
-                                ? pity_starting_temp
-                                : max_pity_starting_point;
     }
   }
 
@@ -481,49 +433,6 @@ bool process_cmd_input_and_set_corres_var(
           strtol(iter_num_rate_up_long_name->second[0].c_str(), &p_end, 10);
       if (*p_end != '\0' || (num_rate_up_temp != 1 && num_rate_up_temp != 2)) {
         error_flag.err_invalid_value_for_num_rate_up_long_name_ctrl_arg = true;
-      }
-    }
-  }
-
-  unsigned long long int current_pull_temp = 0;
-  long long int current_pull_temp_compare = 0;
-  if (iter_current_pull != arg_map.cend()) {
-    if (iter_current_pull->second.size() > 1) {
-      error_flag.err_invalid_value_for_current_pull_ctrl_arg = true;
-    } else if (iter_current_pull->second.size() > 0) {
-      char* p_end = nullptr;
-      char* p_end_compare = nullptr;
-      current_pull_temp =
-          strtoull(iter_current_pull->second[0].c_str(), &p_end, 10);
-      current_pull_temp_compare =
-          strtoll(iter_current_pull->second[0].c_str(), &p_end_compare, 10);
-      if (*p_end != '\0' || *p_end_compare != '\0' ||
-          current_pull_temp_compare < 0) {
-        error_flag.err_invalid_value_for_current_pull_ctrl_arg = true;
-      }
-      // Now we need to check whether the value of -c|--current-pull exceeds its
-      // biggest valid value, i.e., <-p|--pity + 49>
-      if (current_pull_temp >= pity_starting_temp + steps_to_guaranteed_star6) {
-        error_flag.err_invalid_value_for_current_pull_ctrl_arg = true;
-      }
-    }
-  }
-  if (iter_current_pull_long_name != arg_map.cend()) {
-    if (iter_current_pull_long_name->second.size() > 1) {
-      error_flag.err_invalid_value_for_current_pull_ctrl_arg = true;
-    } else if (iter_current_pull_long_name->second.size() > 0) {
-      char* p_end = nullptr;
-      char* p_end_compare = nullptr;
-      current_pull_temp =
-          strtoull(iter_current_pull_long_name->second[0].c_str(), &p_end, 10);
-      current_pull_temp_compare = strtoll(
-          iter_current_pull_long_name->second[0].c_str(), &p_end_compare, 10);
-      if (*p_end != '\0' || *p_end_compare != '\0' ||
-          current_pull_temp_compare < 0) {
-        error_flag.err_invalid_value_for_current_pull_ctrl_arg = true;
-      }
-      if (current_pull_temp >= pity_starting_temp + steps_to_guaranteed_star6) {
-        error_flag.err_invalid_value_for_current_pull_long_name_ctrl_arg = true;
       }
     }
   }
@@ -560,13 +469,11 @@ bool process_cmd_input_and_set_corres_var(
     // Set the value of -p|--pity
     if (iter_pity != arg_map.cend()) {
       assert(iter_pity->second.size() == 1);
-      assert(pity_starting_point <= max_pity_starting_point);
-      pity_starting_point = static_cast<unsigned int>(pity_starting_temp);
+      pity_starting_point = pity_starting_temp;
     }
     if (iter_pity_long_name != arg_map.cend()) {
       assert(iter_pity_long_name->second.size() == 1);
-      assert(pity_starting_point <= max_pity_starting_point);
-      pity_starting_point = static_cast<unsigned int>(pity_starting_temp);
+      pity_starting_point = pity_starting_temp;
     }
     // Set the value of -n|--num-rate-up
     if (iter_num_rate_up != arg_map.cend()) {
@@ -577,15 +484,6 @@ bool process_cmd_input_and_set_corres_var(
       assert(iter_num_rate_up_long_name->second.size() == 1);
       probability_wrapper.set_banner_operator_num(num_rate_up_temp);
     }
-    // Set the value of -c|--current-pull
-    if (iter_current_pull != arg_map.end()) {
-      assert(iter_current_pull->second.size() == 1);
-      current_pull = current_pull_temp;
-    }
-    if (iter_current_pull_long_name != arg_map.end()) {
-      assert(iter_current_pull_long_name->second.size() == 1);
-      current_pull = current_pull_temp;
-    }
   }
 
   return !error_flag.check_err();
@@ -594,13 +492,10 @@ bool process_cmd_input_and_set_corres_var(
 // Display the simulation settings before starting the simulation
 void display_simulation_settings(const ProbabilityWrapper& probability_wrapper,
                                  const unsigned long long int total_pull_time,
-                                 const unsigned int pity_starting_point,
-                                 const unsigned long long int current_pull) {
+                                 const unsigned int pity_starting_point) {
   std::cout << "The simulation settings are:\n";
   std::cout << "\tTotal Pulling Times: " << total_pull_time << "\n";
   std::cout << "\tPity System Starting Point: " << pity_starting_point << "\n";
-  std::cout << "\tCurrent Pull Times: " << current_pull << "\n";
-
   if (probability_wrapper.get_on_banner_star6_conditional_rate() ==
       limited_banner_on_banner_star6_conditional_rate) {
     std::cout << "\tBanner Type: Limited Banner, the conditional rate is "

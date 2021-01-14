@@ -27,12 +27,6 @@ class ErrorFlag {
   bool err_missing_value_for_num_rate_up_ctrl_arg;
   bool err_missing_value_for_num_rate_up_long_name_ctrl_arg;
 
-  bool err_redundant_current_pull_ctrl_arg;
-  bool err_invalid_value_for_current_pull_ctrl_arg;
-  bool err_invalid_value_for_current_pull_long_name_ctrl_arg;
-  bool err_missing_value_for_current_pull_ctrl_arg;
-  bool err_missing_value_for_current_pull_long_name_ctrl_arg;
-
   bool err_conflict_ctrl_arg_flag;
   bool err_unexpected_value_for_ctrl_arg_limited;
   bool err_unexpected_value_for_ctrl_arg_standard;
@@ -63,12 +57,6 @@ class ErrorFlag {
         err_missing_value_for_num_rate_up_ctrl_arg(false),
         err_missing_value_for_num_rate_up_long_name_ctrl_arg(false),
 
-        err_redundant_current_pull_ctrl_arg(false),
-        err_invalid_value_for_current_pull_ctrl_arg(false),
-        err_invalid_value_for_current_pull_long_name_ctrl_arg(false),
-        err_missing_value_for_current_pull_ctrl_arg(false),
-        err_missing_value_for_current_pull_long_name_ctrl_arg(false),
-
         err_conflict_ctrl_arg_flag(false),
         err_unexpected_value_for_ctrl_arg_limited(false),
         err_unexpected_value_for_ctrl_arg_standard(false),
@@ -97,12 +85,6 @@ class ErrorFlag {
            err_invalid_value_for_num_rate_up_long_name_ctrl_arg ||
            err_missing_value_for_num_rate_up_ctrl_arg ||
            err_missing_value_for_num_rate_up_long_name_ctrl_arg ||
-
-           err_redundant_current_pull_ctrl_arg ||
-           err_invalid_value_for_current_pull_ctrl_arg ||
-           err_invalid_value_for_current_pull_long_name_ctrl_arg ||
-           err_missing_value_for_current_pull_ctrl_arg ||
-           err_missing_value_for_current_pull_long_name_ctrl_arg ||
 
            err_conflict_ctrl_arg_flag ||
            err_unexpected_value_for_ctrl_arg_limited ||
