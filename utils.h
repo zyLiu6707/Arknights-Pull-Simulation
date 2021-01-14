@@ -24,7 +24,7 @@ const double standard_banner_on_banner_star6_conditional_rate = 0.5;
 //     getting a star6    of getting star6     after a failed pull
 const unsigned long long int steps_to_guaranteed_star6 = 49;
 
-const unsigned long int max_pity_starting_point =
+const unsigned long long int max_pity_starting_point =
     4294967295;  // DO NOT USE ULONG_MAX - it can be (2^64 - 1) on some platform
 
 // Pre-defined parameters for displaying the results
@@ -417,17 +417,17 @@ bool process_cmd_input_and_set_corres_var(
     }
   }
 
-  unsigned long int pity_starting_temp = 50;
-  long int pity_starting_temp_compare = 50;
+  unsigned long long int pity_starting_temp = 50;
+  long long int pity_starting_temp_compare = 50;
   if (iter_pity != arg_map.cend()) {
     if (iter_pity->second.size() > 1) {
       error_flag.err_invalid_value_for_pity_ctrl_arg = true;
     } else if (iter_pity->second.size() > 0) {
       char* p_end = nullptr;
       char* p_end_compare = nullptr;
-      pity_starting_temp = strtoul(iter_pity->second[0].c_str(), &p_end, 10);
+      pity_starting_temp = strtoull(iter_pity->second[0].c_str(), &p_end, 10);
       pity_starting_temp_compare =
-          strtol(iter_pity->second[0].c_str(), &p_end_compare, 10);
+          strtoll(iter_pity->second[0].c_str(), &p_end_compare, 10);
       if (*p_end != '\0' || *p_end_compare != '\0' ||
           pity_starting_temp_compare < 0) {
         error_flag.err_invalid_value_for_pity_ctrl_arg = true;
@@ -560,11 +560,13 @@ bool process_cmd_input_and_set_corres_var(
     // Set the value of -p|--pity
     if (iter_pity != arg_map.cend()) {
       assert(iter_pity->second.size() == 1);
-      pity_starting_point = pity_starting_temp;
+      assert(pity_starting_point <= max_pity_starting_point);
+      pity_starting_point = static_cast<unsigned int>(pity_starting_temp);
     }
     if (iter_pity_long_name != arg_map.cend()) {
       assert(iter_pity_long_name->second.size() == 1);
-      pity_starting_point = pity_starting_temp;
+      assert(pity_starting_point <= max_pity_starting_point);
+      pity_starting_point = static_cast<unsigned int>(pity_starting_temp);
     }
     // Set the value of -n|--num-rate-up
     if (iter_num_rate_up != arg_map.cend()) {
