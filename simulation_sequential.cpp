@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
     }
     else {
       pity_count++;
-      if (pity_count > pity_starting_point) {
+      if (pity_count >= pity_starting_point) {
         star6_threshold += delta_star6_threshold;
         target_star6_threshold += delta_target_star6_threshold;
       }
