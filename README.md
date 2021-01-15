@@ -22,7 +22,7 @@ You need to specify some command line arguments to run the simulation:
                         [-p|--pity <value>] [-n|--num-rate-up <value>] [-c|--current-pull <value>]
 ```
 
-The arguments in square brackets are optional, and their orders does not matter. You can use either the short name arguments (`-t`, `-p` and `-n`) or the long name arguments (`--total-pull-time`, `--pity` and `--num-rate-up`) as you wish. 
+The arguments in square brackets are optional, and their orders does not matter. You can use either the short name arguments (`-t`, `-p`, `-n` and `-c`) or the long name arguments (`--total-pull-time`, `--pity`, `--num-rate-up` and `--current-pull`) as you wish. 
 
 Each arguments' meaning is explained in the following table:
 
