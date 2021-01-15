@@ -13,9 +13,10 @@ int main(int argc, char* argv[]) {
   unsigned int pity_starting_point = 50;
 
   unsigned long long int total_pull_time = 100000000;
+  unsigned long long int current_pull = 0;
 
   bool can_continue = process_cmd_input_and_set_corres_var(
-      argc, argv, probability_wrapper, total_pull_time, pity_starting_point);
+      argc, argv, probability_wrapper, total_pull_time, pity_starting_point, current_pull);
   if (!can_continue) {
     // Exit the program here rather than exiting when argument format error is
     // found in order to avoid memory leak
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
   }
 
   display_simulation_settings(probability_wrapper, total_pull_time,
-                              pity_starting_point);
+                              pity_starting_point, current_pull);
 
   auto seed = get_random_seed();
   std::mt19937_64 mt(seed);
@@ -40,11 +41,11 @@ int main(int argc, char* argv[]) {
   unsigned long long int target_star6_count = 0;
   // Count the times of countinuously getting a non-star-6 operator
   unsigned long long int pity_count = 0;
-  // Count the times of pulling. Will be reset to 0 when get the target star 6
-  // operator. Theoretically, no matter how many bits used to store the value of
-  // current_pull_count, there exists a non-zero probability that it
-  // will overflow - but the probability will converge to zero when
-  // num of bits grows to positive infinity
+  // Count the times of pulling in a trial. Will be reset to 0 when get the
+  // target star 6 operator. Theoretically, no matter how many bits used to
+  // store the value of current_pull_count, there exists a non-zero probability
+  // that it will overflow - but the probability will converge to zero when num
+  // of bits grows to positive infinity
   unsigned long long int current_pull_count = 0;
 
   // The thresholds will be used to decide whether we got a star6/target star6
@@ -91,24 +92,28 @@ int main(int argc, char* argv[]) {
   // Start simulation
   for (unsigned long long int i = 0; i < total_pull_time; ++i) {
     unsigned int rand_num = dist(mt);
-    current_pull_count++;  // Leave the index 0 of result vector unused
+    current_pull_count++;  // leave the index 0 of result vector unused
     // Get a star-6 operator
     if (rand_num < star6_threshold) {
       star6_count++;
+      pity_count = 0;
       // This star-6 operator is also your target operator
       if (rand_num < target_star6_threshold) {
         target_star6_count++;
         if (current_pull_count < result.size()) {
           result[current_pull_count]++;
-        } else if (rare_event.size() < max_rare_event_map_size) {
+        }
+        else if (rare_event.size() < max_rare_event_map_size) {
           rare_event[current_pull_count]++;
         }
         current_pull_count = 0;
+        // Finish currrent trial, reset the pity counter and start next trial
+        pity_count = current_pull;
       }
-      pity_count = 0;
       star6_threshold = init_star6_threshold;
       target_star6_threshold = init_target_star6_threshold;
-    } else {
+    }
+    else {
       pity_count++;
       if (pity_count > pity_starting_point) {
         star6_threshold += delta_star6_threshold;
