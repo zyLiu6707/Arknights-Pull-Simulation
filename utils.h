@@ -81,7 +81,7 @@ uint_fast64_t get_random_seed() {
 
 // Display the help message
 void display_help_message() {
-  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--standard|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>]\n\n"
+  std::cout << "Usage: [--help] [-t|--total-pull-time <value>] [--standard|--limited] [-p|--pity <value>] [-n|--num-rate-up <value>] [-c|--current-pull <value>]\n\n"
                "--help : Display the help message\n"
                "-t|--total-pull-time : Set the time of pulling in a simulation\n"
                "                        Valid value is an integer between [1, 18446744073709551615] (inclusive) on Linux 64bit/C++11\n"
