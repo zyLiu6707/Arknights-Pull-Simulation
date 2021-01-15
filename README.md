@@ -78,7 +78,7 @@ Here are several quick examples to start with:
 
   `./simulation_sequential --standard -n 1 -t <a-positive-big-integer>`
 
-* Simulate a single-rate-up banner which you will start to roll, but you have pulled for 42 times without getting a 6★ operator in another standard banner.
+* Simulate a single-rate-up banner which you will start to roll, but you have pulled for 42 times without getting a 6★ operator in another standard banner
 
   `./simulation_sequential --standard -n 1 -c 42 -t <a-positive-big-integer>`
 
