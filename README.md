@@ -32,9 +32,9 @@ Each arguments' meaning is explained in the following table:
 | `-t`<br/>`--total-pull-time` | Set how many times of pulling will be executed during the simulation<br/>Control the scale of the simulation<br/>**Valid value: an integer between [1, 18446744073709551615] (inclusive)** |
 | `--standard`                 | Estimate the theoretical probability in a standard banner    |
 | `--limited`                  | Estimate the theoretical probability in a limited banner     |
-| `-p`<br/>`--pity`            | Set the starting point where the pity system comes into effect<br/>The pity system will start to increase the probability of getting a 6★ operator in the pull after the `N-th` pull (`N` is the number you specified)<br/>**Valid value: an integer from [0, 4294967295] (inclusive)** |
+| `-p`<br/>`--pity`            | Set the starting point where the pity system comes into effect<br/>The pity system will start to increase the probability of getting a 6★ operator in the pull after the `N-th` pull (`N` is the number you specified)<br/>**Valid value: an integer between [0, 4294967295] (inclusive)** |
 | `-n`<br/>`--num-rate-up`     | Set whether to simulate a single-rate-up banner or a double-rate-up banner<br/>**Valid value: either 1 or 2** |
-| `-c`<br/>`--currentl-pull`   | Set how many times have you pulled but without getting a 6★ operator<br/>**Valid value: an integer from [0, `<-p \| --pity value>` + 49) (inclusive, exclusive)** |
+| `-c`<br/>`--current-pull`   | Set how many times have you pulled but without getting a 6★ operator<br/>**Valid value: an integer between [0, `<-p\|--pity value>` + 49) (inclusive, exclusive)** |
 
 On default, if no arguments are provided, the program will simulate 100,000,000 times of pulling in a double-rate-up limited banner, with zero value for `-c` or `--current-pull` and pity starting point equals to 50 (equivalent to run with `--limited -t 100000000 -n 2 -p 50`), which is same as in a limited banner in Arknights, unless you specify the corresponding arguments to override the default behavior of the program.
 
