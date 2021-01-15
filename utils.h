@@ -99,7 +99,7 @@ void display_help_message() {
                "                              simulation with maximum valid value for pity starting time (i.e., 4294967295)\n"
                "     -n|--num-rate-up : Set the number of operator(s) that currently rate up.\n"
                "                        The valid values are 1 and 2\n"
-               "    -c|--current-pull : Set how many times that you have already pulled\n"
+               "    -c|--current-pull : Set how many times that you have already pulled without getting a star-6 operator\n"
                "                        Valid value is an integer between [0, <-p|--pity value> + 49) (inclusive, exclusive)\n"
                "Note that the order of these arguments does not matter.\n"
                << std::endl;

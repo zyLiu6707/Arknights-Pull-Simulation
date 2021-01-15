@@ -19,7 +19,7 @@ You need to specify some command line arguments to run the simulation:
 
 ```shell
 ./simulation_sequential [--help] [-t|--total-pull-time <value>] [--standard|--limited] 
-                        [-p|--pity <value>] [-n|--num-rate-up <value>] 
+                        [-p|--pity <value>] [-n|--num-rate-up <value>] [-c|--current-pull <value>]
 ```
 
 The arguments in square brackets are optional, and their orders does not matter. You can use either the short name arguments (`-t`, `-p` and `-n`) or the long name arguments (`--total-pull-time`, `--pity` and `--num-rate-up`) as you wish. 
@@ -34,8 +34,9 @@ Each arguments' meaning is explained in the following table:
 | `--limited`                  | Estimate the theoretical probability in a limited banner     |
 | `-p`<br/>`--pity`            | Set the starting point where the pity system comes into effect<br/>The pity system will start to increase the probability of getting a 6★ operator in the pull after the `N-th` pull (`N` is the number you specified)<br/>**Valid value: an integer from [0, 4294967295] (inclusive)** |
 | `-n`<br/>`--num-rate-up`     | Set whether to simulate a single-rate-up banner or a double-rate-up banner<br/>**Valid value: either 1 or 2** |
+| `-c`<br/>`--currentl-pull`   | Set how many times have you pulled but without getting a 6★ operator<br/>**Valid value: an integer from [0, <`-p`|`--pity` value> + 49) (inclusive, exclusive)** |
 
-On default, if no arguments are provided, the program will simulate a double-rate-up limited banner with 100,000,000 times pulling with pity starting point equals to 50 (equivalent to run with `--limited -t 100000000 -n 2 -p 50`), which is same as in a limited banner in Arknights, unless you specify the corresponding arguments to override the default behavior of the program.
+On default, if no arguments are provided, the program will simulate 100,000,000 times of pulling in a double-rate-up limited banner, with zero value for `-c` or `--current-pull` and pity starting point equals to 50 (equivalent to run with `--limited -t 100000000 -n 2 -p 50`), which is same as in a limited banner in Arknights, unless you specify the corresponding arguments to override the default behavior of the program.
 
 Simulation results are under `res/`. High resolution line charts and other images are under `img/`. Some test cases and testing python scripts that I used during my development are under `test/`, which you don't need to worry about.
 
@@ -76,6 +77,10 @@ Here are several quick examples to start with:
 * Simulate a single-rate-up standard banner
 
   `./simulation_sequential --standard -n 1 -t <a-positive-big-integer>`
+
+* Simulate a single-rate-up banner which you will start to roll, but you have pulled for 42 times without getting a 6★ operator in another standard banner.
+
+  `./simulation_sequential --standard -n 1 -c 42 -t <a-positive-big-integer>`
 
 * Simulate a single-rate-up limited banner (not appeared in Arknights yet!)
 
